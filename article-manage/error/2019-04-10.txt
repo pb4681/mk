@@ -1,0 +1,30 @@
+错误SQL语句：
+INSERT INTO product (title,description,siteid,column,uploadtime,userid) VALUES ('1','1',1006,11,1554877962,1)
+客户IP:127.0.0.1
+时间 :2019-04-10 14:32:43
+
+错误SQL语句：
+INSERT INTO product (title,description,siteid,column,uploadtime,userid) VALUES ('111','3',1001,57,1554878279,1)
+客户IP:127.0.0.1
+时间 :2019-04-10 14:38:00
+
+错误SQL语句：
+INSERT INTO product (title,description,siteid,column,uploadtime,userid) VALUES ('111','3',1001,57,1554878776,1)
+客户IP:127.0.0.1
+时间 :2019-04-10 14:46:18
+
+错误SQL语句：
+INSERT INTO product (title,description,siteid,column,uploadtime,userid) VALUES ('111','3',1001,57,1554878806,1)
+客户IP:127.0.0.1
+时间 :2019-04-10 14:46:46
+
+错误SQL语句：
+INSERT INTO product (title,description,siteid,column,uploadtime,userid) VALUES ('111','3',1001,57,1554879075,1)
+客户IP:127.0.0.1
+时间 :2019-04-10 14:51:15
+
+错误SQL语句：
+SELECT templet FROM product_templet WHERE siteid=1001
+客户IP:58.34.247.9
+时间 :2019-04-10 16:19:54
+

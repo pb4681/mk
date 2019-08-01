@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>麦开信息管理系统 - Product_Display</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white">
+    <div class="form-wrapper">
+        <form class="layui-form">
+            <div class="layui-form-item my-form-item">
+                <label class="layui-form-label my-label">网站选择</label>
+                <div class="layui-input-block my-select">
+                    <select name="site" lay-verify="required" lay-filter="site" id="site">
+                        <option value=""></option>
+                        <option value="1001">办公家具（www.pinyuan.cc）</option>
+                        <option value="1002">办公设备（www.pinyuan.cc）</option>
+                        <option value="1003">办公家具厂（www.china-pinyuan.com）</option>
+                        <option value="1004">儿童家具（children.pinyuan.cc）</option>
+                        <option value="1005">学校家具（school.pinyuan.cc）</option>
+                        <option value="1006">医院家具（hospital.pinyuan.cc）</option>
+                        <option value="1007">图书馆家具（library.pinyuan.cc）</option>
+                        <option value="1008">办公家具装修（office.pinyuan.cc）</option>
+                        <option value="1009">公寓家具（apartment.pinyuan.cc）</option>
+                        <option value="1010">餐厅家具（restaurant.pinyuan.cc）</option>
+                        <option value="1011">酒店家具（hotel.pinyuan.cc）</option>
+                        <option value="1012">零售家具（shelf.pinyuan.cc）</option>
+                        <option value="1013">智美综合（www.zmshoo.com）</option>
+                        <option value="1014">新风净化（cleaner.zmshoo.com）</option>
+                        <option value="1015">净水系统（water.zmshoo.com）</option>
+                    </select>
+                </div>
+            </div>
+			<div class="layui-form-item" style="display: inline-block;">
+                    <label class="layui-form-label">分类选择</label>
+                    <div class="layui-input-inline my-text-input-250">
+                        <select name="cat" lay-verify="required" lay-filter="cat" id="cat">
+                            <option value=""></option>
+                        </select>
+                    </div>
+            </div>
+            <div class="layui-form-item my-form-item isupload-form-item">
+                <label class="layui-form-label my-label">是否上传</label>
+                <div class="layui-input-block my-select isupload-select">
+                    <select name="isupload" lay-verify="required" lay-filter="isupload" id="isupload">
+                        <option value=""></option>
+                        <option value="1">未上传</option>
+                        <option value="2">已上传</option>
+                    </select>
+                </div>
+            </div>
+			
+			
+        </form>
+    </div>
+    <div class="table">
+        <table id="product_list" lay-filter="table"></table>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    <script type="text/html" id="tabletop">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+            <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+        </div>
+    </script>
+    <script type="text/html" id="isupld">
+        {{#  if(d.isupload == 1){ }}
+            <button class="layui-btn layui-btn-primary layui-btn-xs">未上传</button>
+        {{#  } else { }}
+            <button class="layui-btn layui-btn-xs">已上传</button>
+        {{#  } }}  
+    </script>
+    <script type="text/html" id="bar">
+        <a class="layui-btn layui-btn-xs" lay-event="change">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        {{#  if(d.isupload == 2){ }}
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="watch">预览</a>
+        {{#  } }}  
+    </script>
+    <script>
+        var json;   //全局变量，传递给子页面
+        layui.use(['form', 'table', 'layer'], function () {
+            var form = layui.form;
+            var table = layui.table;
+            var layer = layui.layer;
+            var $ = layui.$;
+            table.render({
+                elem: '#product_list',
+                toolbar: '#tabletop',
+                height: 530,
+                loading: true, //翻页加loading
+                url: './api/get_pro_page_list.php', //数据接口
+                where: {
+                    'siteid': '',
+					'cat':'',
+                    'isupload': ''
+                }, //设定异步数据接口的额外参数
+                page: true, //开启分页
+                cols: [[ //表头
+                    { type: 'checkbox', width: '3%' },
+                    { field: 'id', title: '系统ID', width: '9%', sort: true },
+                    { field: 'aid', title: '文章ID', width: '8%' },
+                    { field: 'title', title: '标题', width: '20%' },
+                    { field: 'siteid', title: '网站名称', width: '10.5%' },
+                    { field: 'site', title: '网站名称', width: '15.5%' },
+                    { field: 'cat', title: '栏目名称', width: '8%' },
+                    { field: 'uploadtime', title: '上传时间', width: '12%' },
+                    { title: '状态', width: '10.5%', align: 'center', toolbar: '#isupld' },
+                    { title: '操作', width: '14.8%', align: 'center', toolbar: '#bar' }
+                ]],
+                done: function () {
+                    $("[data-field='siteid']").css('display', 'none');
+                }
+            });
+            form.on('select(site)', function (data) {
+			var value = data.value;
+                    $.get('./api/get_site_data.php', function (data) {
+                        var source_arr = data['source'][value];
+                        var car_arr = data['cat_pro'][value];
+                        $('#cat').html('<option value=""></option>');
+                        for (var key in car_arr) {
+                            $('#cat').append('<option value="' + key + '">' + car_arr[key] + '</option>');
+                        }
+                        form.render('select');
+                    });
+                table.reload('product_list', {
+                    url: './api/get_pro_page_list.php',
+                    where: {
+                        'siteid': data.value,
+						'cat':$('#cat').val(),
+                        'isupload': $('#isupload').val()
+                    }, //设定异步数据接口的额外参数
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+            });
+			  form.on('select(cat)', function (data) {
+                table.reload('product_list', {
+                    url: './api/get_pro_page_list.php',
+                    where: {
+                        'siteid': $('#site').val(),
+						'cat':data.value,
+                        'isupload': $('#isupload').val()
+                    }, //设定异步数据接口的额外参数
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+            });
+            form.on('select(isupload)', function (data) {
+                table.reload('product_list', {
+                    url: './api/get_pro_page_list.php',
+                    where: {
+                        'siteid': $('#site').val(),
+						'cat':$('#cat').val(),
+                        'isupload': data.value
+                    }, //设定异步数据接口的额外参数
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+            });
+            //监听工具条
+            table.on('tool(table)', function (obj) {
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                var tr = obj.tr; //获得当前行 tr 的DOM对象
+                var id = data.id;
+                var siteid = data.siteid;
+                var aid = data.aid;
+
+                var d_j = {
+                    '1001': 'www.pinyuan.cc',
+                    '1002': 'www.pinyuan.cc',
+                    '1003': 'www.china-pinyuan.com',
+                    '1004': 'children.pinyuan.cc',
+                    '1005': 'school.pinyuan.cc',
+                    '1006': 'hospital.pinyuan.cc',
+                    '1007': 'library.pinyuan.cc',
+                    '1008': 'office.pinyuan.cc',
+                    '1009': 'apartment.pinyuan.cc',
+                    '1010': 'restaurant.pinyuan.cc',
+                    '1011': 'hotel.pinyuan.cc',
+                    '1012': 'shelf.pinyuan.cc',
+                    '1013': 'www.zmshoo.com',
+                    '1014': 'cleaner.zmshoo.com',
+                    '1015': 'water.zmshoo.com',
+                }
+
+                if (layEvent === 'watch') { //预览
+                    window.open('http://' + d_j[siteid] + '/plus/view.php?aid=' + aid, '_blank');
+                } else if (layEvent === 'change') {
+                    layer.open({
+                        type: 2,
+                        title: '编辑产品',
+                        area: ['80%', '80%'],
+                        shade: 0,
+                        maxmin: true,
+                        offset: 'auto',
+                        content: './product_edit.php?id='+id,
+                        btn: ['保存', '上传', '取消'],
+                        shade: [0.4, '#393D49'],
+                        btn1: function (index, layero) {
+                            var son = layero.find("iframe")[0].contentWindow;
+                            var aid = son.id.val();
+                            var seo_title = son.title.val();
+                            var seo_keyword = son.keyword.val();
+                            var img_lit = son.img_lit;
+                            var seo_description = son.description.val();
+                            var site_select = son.site_select.val();
+                            var site_name = son.site_select.next().find('input').val();
+                            var cat_select = son.cat_select.val();
+                            var cat_name = son.cat_select.next().find('input').val();
+                            var pro_content = son.pro_content;
+                            if(!site_select||(!aid&&!cat_select)){
+                                layer.msg('请检查是否存在漏填项', {
+                                    time: 2000000, //20s后自动关闭
+                                    btn: ['确定'],
+                                    zIndex: layer.zIndex * 1000000,
+                                });
+                                return false;
+                            }
+                            pro_content.find('.layui-btn,.input-upload,.layui-upload-file').remove();
+                            pro_content.find('.add-input').removeAttr('style');
+                            $.ajax({
+                                url: './api/product_save.php',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    type: 'edit',
+                                    id: id,
+                                    aid: aid,
+                                    title: seo_title,
+                                    keyword: seo_keyword,
+                                    imglit: img_lit,
+                                    description: seo_description,
+                                    siteid: site_select,
+                                    site: site_name,
+                                    catid: cat_select,
+                                    cat: cat_name,
+                                    content: pro_content.html()
+                                },
+                                success: function (data) {
+                                    // 同步更新缓存对应的值
+                                    table.reload('product_list', {
+                                        url: './api/get_pro_page_list.php',
+                                        where: {
+                                            'siteid': $('#site').val(),
+                                            'isupload': $('#isupload').val()
+                                        } //设定异步数据接口的额外参数
+                                    });
+                                    if (data.code !== 217) {
+                                        layer.msg('保存出错', {
+                                            time: 2000000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                        return false;
+                                    }
+                                    layer.closeAll();
+                                },
+                                error: function () {
+                                    layer.msg('服务器连接失败', {
+                                        time: 20000, //20s后自动关闭
+                                        btn: ['确定'],
+                                        zIndex: layer.zIndex * 1000000,
+                                    });
+                                }
+                            });
+                            return false;
+                        },
+                        btn2: function (index, layero) {
+                            var son = layero.find("iframe")[0].contentWindow;
+                            var aid = son.id.val();
+                            var seo_title = son.title.val();
+                            var seo_keyword = son.keyword.val();
+                            var img_lit = son.img_lit;
+                            var seo_description = son.description.val();
+                            var site_select = son.site_select.val();
+                            var site_name = son.site_select.next().find('input').val();
+                            var cat_select = son.cat_select.val();
+                            var cat_name = son.cat_select.next().find('input').val();
+                            var pro_content = son.pro_content;
+                            if(!site_select||(!aid&&!cat_select)){
+                                layer.msg('请检查是否漏填', {
+                                    time: 2000000, //20s后自动关闭
+                                    btn: ['确定'],
+                                    zIndex: layer.zIndex * 1000000,
+                                });
+                                return false;
+                            }
+                            pro_content.find('.layui-btn,.input-upload,.layui-upload-file').remove();
+                            pro_content.find('.add-input').removeAttr('style');
+                            $.ajax({
+                                url: './api/product_upload.php',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    id: id,
+                                    aid: aid,
+                                    title: seo_title,
+                                    keyword: seo_keyword,
+                                    imglit: img_lit,
+                                    description: seo_description,
+                                    siteid: site_select,
+                                    site: site_name,
+                                    catid: cat_select,
+                                    cat: cat_name,
+                                    content: pro_content.html()
+                                },
+                                success: function (data) {
+                                    // 同步更新缓存对应的值
+                                    table.reload('product_list', {
+                                        url: './api/get_pro_page_list.php',
+                                        where: {
+                                            'siteid': $('#site').val(),
+                                            'isupload': $('#isupload').val()
+                                        } //设定异步数据接口的额外参数
+                                    });
+                                    if (data.code !== 216) {
+                                        layer.msg('上传出错', {
+                                            time: 2000000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                        return false;
+                                    }
+                                    layer.closeAll();
+                                },
+                                error: function () {
+                                    layer.msg('服务器连接失败', {
+                                        time: 20000, //20s后自动关闭
+                                        btn: ['确定'],
+                                        zIndex: layer.zIndex * 1000000,
+                                    });
+                                }
+                            });
+                            return false;
+                        },
+                        btn3: function (index, layero) {
+                            layer.closeAll();
+                        },
+                        zIndex: layer.zIndex,
+                        success: function () {   //弹出后执行
+                            
+                        }
+                    });
+                } else { //删除
+                    layer.confirm('确定要删除？？', function (index) {
+                        obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                        layer.close(index);
+                        $.get('./api/product_delete.php', { id: obj.data.id });
+                    });
+                }
+            });
+            //监听头部按钮
+            table.on('toolbar(table)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                switch (obj.event) {
+                    case 'add':
+                        layer.open({
+                            type: 2,
+                            title: '添加产品',
+                            area: ['80%', '80%'],
+                            shade: 0,
+                            maxmin: true,
+                            offset: 'auto',
+                            content: './product_edit.php',
+                            btn: ['保存', '上传', '取消'],
+                            shade: [0.4, '#393D49'],
+                            btn1: function (index, layero) {
+                                var son = layero.find("iframe")[0].contentWindow;
+                                var aid = son.id.val();
+                                var seo_title = son.title.val();
+                                var seo_keyword = son.keyword.val();
+                                var img_lit = son.img_lit;
+                                var seo_description = son.description.val();
+                                var site_select = son.site_select.val();
+                                var site_name = son.site_select.next().find('input').val();
+                                var cat_select = son.cat_select.val();
+                                var cat_name = son.cat_select.next().find('input').val();
+                                var pro_content = son.pro_content;
+                                if(!site_select||img_lit===undefined||(!aid&&!cat_select)){
+                                    layer.msg('请检查是否上传缩略图或存在漏填项', {
+                                        time: 2000000, //20s后自动关闭
+                                        btn: ['确定'],
+                                        zIndex: layer.zIndex * 1000000,
+                                    });
+                                    return false;
+                                }
+                                pro_content.find('.layui-btn,.input-upload,.layui-upload-file').remove();
+                                pro_content.find('.add-input').removeAttr('style');
+                                $.ajax({
+                                    url: './api/product_save.php',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        type: 'add',
+                                        aid: aid,
+                                        title: seo_title,
+                                        keyword: seo_keyword,
+                                        imglit: img_lit,
+                                        description: seo_description,
+                                        siteid: site_select,
+                                        site: site_name,
+                                        catid: cat_select,
+                                        cat: cat_name,
+                                        content: pro_content.html()
+                                    },
+                                    success: function (data) {
+                                        // 同步更新缓存对应的值
+                                        table.reload('product_list', {
+                                            url: './api/get_pro_page_list.php',
+                                            where: {
+                                                'siteid': $('#site').val(),
+                                                'isupload': $('#isupload').val()
+                                            } //设定异步数据接口的额外参数
+                                        });
+                                        if (data.code !== 217) {
+                                            layer.msg('保存出错', {
+                                                time: 2000000, //20s后自动关闭
+                                                btn: ['确定'],
+                                                zIndex: layer.zIndex * 1000000,
+                                            });
+                                            return false;
+                                        }
+                                        layer.closeAll();
+                                    },
+                                    error: function () {
+                                        layer.msg('服务器连接失败', {
+                                            time: 20000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                    }
+                                });
+                                return false;
+                            },
+                            btn2: function (index, layero) {
+                                var son = layero.find("iframe")[0].contentWindow;
+                                var aid = son.id.val();
+                                var seo_title = son.title.val();
+                                var seo_keyword = son.keyword.val();
+                                var img_lit = son.img_lit;
+                                var seo_description = son.description.val();
+                                var site_select = son.site_select.val();
+                                var site_name = son.site_select.next().find('input').val();
+                                var cat_select = son.cat_select.val();
+                                var cat_name = son.cat_select.next().find('input').val();
+                                var pro_content = son.pro_content;
+                                if(!site_select||img_lit===undefined||(!aid&&!cat_select)){
+                                    layer.msg('请检查是否上传缩略图或存在漏填项', {
+                                        time: 2000000, //20s后自动关闭
+                                        btn: ['确定'],
+                                        zIndex: layer.zIndex * 1000000,
+                                    });
+                                    return false;
+                                }
+                                pro_content.find('.layui-btn,.input-upload,.layui-upload-file').remove();
+                                pro_content.find('.add-input').removeAttr('style');
+                                $.ajax({
+                                    url: './api/product_upload.php',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        aid: aid,
+                                        title: seo_title,
+                                        keyword: seo_keyword,
+                                        imglit: img_lit,
+                                        description: seo_description,
+                                        siteid: site_select,
+                                        site: site_name,
+                                        catid: cat_select,
+                                        cat: cat_name,
+                                        content: pro_content.html()
+                                    },
+                                    success: function (data) {
+                                        // 同步更新缓存对应的值
+                                        table.reload('product_list', {
+                                            url: './api/get_pro_page_list.php',
+                                            where: {
+                                                'siteid': $('#site').val(),
+                                                'isupload': $('#isupload').val()
+                                            } //设定异步数据接口的额外参数
+                                        });
+                                        if (data.code !== 216) {
+                                            layer.msg('上传出错', {
+                                                time: 2000000, //20s后自动关闭
+                                                btn: ['确定'],
+                                                zIndex: layer.zIndex * 1000000,
+                                            });
+                                            return false;
+                                        }
+                                        layer.closeAll();
+                                    },
+                                    error: function () {
+                                        layer.msg('服务器连接失败', {
+                                            time: 20000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                    }
+                                });
+                                return false;
+                            },
+                            btn3: function (index, layero) {
+                                layer.closeAll();
+                            },
+                            zIndex: layer.zIndex,
+                            success: function () {   //弹出后执行
+
+                            }
+                        });
+                        break;
+                    case 'delete':
+                        if (!checkStatus.data.length) {
+                            layer.msg('请选择要删除的文章', {
+                                time: 20000, //20s后自动关闭
+                                btn: ['确定']
+                            });
+                        } else {
+                            layer.confirm('确定要删除？？', function (index) {
+                                var pro_list = [];
+                                var pro_data = checkStatus.data;
+                                for (var j in checkStatus.data) {
+                                    pro_list.push(pro_data[j].id);
+                                }
+                                var pro_str = pro_list.join(',');
+                                layer.close(index);
+                                $.get('./api/product_delete.php', { id: pro_str }, function () {
+                                    table.reload('product_list', {
+                                        url: './api/get_pro_page_list.php',
+                                        where: {
+                                            'siteid': $('#site').val(),
+                                            'isupload': $('#isupload').val()
+                                        } //设定异步数据接口的额外参数
+                                    });
+                                });
+                            });
+                        }
+                        break;
+                };
+            });
+        });
+    </script>
+</body>
+
+</html>

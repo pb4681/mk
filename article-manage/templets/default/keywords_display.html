@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>麦开信息管理系统 - Keywords_Display</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white">
+    <div class="form-wrapper">
+        <form class="layui-form">
+            <div class="layui-form-item my-form-item">
+                <label class="layui-form-label my-label">网站</label>
+                <div class="layui-input-block my-select">
+                    <select name="site" lay-verify="required" lay-filter="site" id="sel_site">
+                        <option value=""></option>
+                        <option value="1001">办公家具（www.pinyuan.cc）</option>
+                        <option value="1002">办公设备（www.pinyuan.cc）</option>
+                        <option value="1003">办公家具厂（www.china-pinyuan.com）</option>
+                        <option value="1004">儿童家具（children.pinyuan.cc）</option>
+                        <option value="1005">学校家具（school.pinyuan.cc）</option>
+                        <option value="1006">医院家具（hospital.pinyuan.cc）</option>
+                        <option value="1007">图书馆家具（library.pinyuan.cc）</option>
+                        <option value="1008">办公家具装修（office.pinyuan.cc）</option>
+                        <option value="1009">公寓家具（apartment.pinyuan.cc）</option>
+                        <option value="1010">餐厅家具（restaurant.pinyuan.cc）</option>
+                        <option value="1011">酒店家具（hotel.pinyuan.cc）</option>
+                        <option value="1012">零售家具（shelf.pinyuan.cc）</option>
+                        <option value="1013">智美综合（www.zmshoo.com）</option>
+                        <option value="1014">新风净化（cleaner.zmshoo.com）</option>
+                        <option value="1015">净水系统（water.zmshoo.com）</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item my-form-item isupload-form-item">
+                <label class="layui-form-label my-label">是否使用</label>
+                <div class="layui-input-block my-select isupload-select">
+                    <select name="isupload" lay-verify="required" lay-filter="isupload" id="sel_isupload">
+                        <option value=""></option>
+                        <option value="1">未使用</option>
+                        <option value="2">已使用</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="table">
+        <table id="article_list" lay-filter="table"></table>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    <script type="text/html" id="tabletop">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+            <button class="layui-btn layui-btn-sm" lay-event="import">关键词导入</button>
+        </div>
+    </script>
+    <script type="text/html" id="status">
+        {{#  if(d.isupload == 1){ }}
+            <button class="layui-btn layui-btn-primary layui-btn-xs">未使用</button>
+        {{#  } else { }}
+            <button class="layui-btn layui-btn-xs">已使用</button>
+        {{#  } }}  
+    </script>
+    <script type="text/html" id="bar">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+    <script>
+        layui.use(['form', 'table', 'layer'], function () {
+            var form = layui.form;
+            var table = layui.table;
+            var layer = layui.layer;
+            var $ = layui.$;
+            table.render({
+                elem: '#article_list',
+                toolbar: '#tabletop',
+                height: 530,
+                loading: true, //翻页加loading
+                url: './api/get_kw_page_list.php', //数据接口
+                where: {
+                    'siteid': '',
+                    'isupload': ''
+                }, //设定异步数据接口的额外参数
+                page: true, //开启分页
+                cols: [[ //表头
+                    { type: 'checkbox', width: '3%' },
+                    { field: 'id', title: '系统ID', width: '9%' },
+                    { field: 'siteid', title: '网站ID', width: '24%' },
+                    { field: 'site', title: '网站名称', width: '24%' },
+                    { field: 'keyword', title: '关键词', width: '18%' },
+                    { field: 'importtime', title: '导入时间', width: '12%' },
+                    { field: 'usetime', title: '使用时间', width: '12%' },
+                    { title: '状态', width: '8%', align: 'center', toolbar: '#status' },
+                    { title: '操作', width: '14.5%', align: 'center', toolbar: '#bar' }
+                ]],
+                done: function () {
+                    $("[data-field='siteid']").css('display', 'none');
+                }
+            });
+            form.on('select(site)', function (data) {
+                table.reload('article_list', {
+                    url: './api/get_kw_page_list.php',
+                    where: {
+                        'siteid': data.value,
+                        'isupload': $('#sel_isupload').val()
+                    }, //设定异步数据接口的额外参数
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+            });
+            form.on('select(isupload)', function (data) {
+                table.reload('article_list', {
+                    url: './api/get_kw_page_list.php',
+                    where: {
+                        'siteid': $('#sel_site').val(),
+                        'isupload': data.value
+                    }, //设定异步数据接口的额外参数
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+            });
+            //监听工具条
+            table.on('tool(table)', function (obj) {
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                var tr = obj.tr; //获得当前行 tr 的DOM对象
+                var id = data.id;
+                var keyword = data.keyword;
+
+                if (layEvent === 'edit') { //编辑
+                    json = JSON.stringify(data);
+                    layer.prompt({
+                        formType: 0,
+                        value: keyword,
+                        maxlength: 10000,
+                        title: '请将标题粘贴于此',
+                        area: ['500px', '250px'] //自定义文本域宽高
+                    }, function (value, index, elem) {
+                        $.post('./api/keyword_edit.php',{id:id,keyword:value},function(res){
+                            if(res.code === 220){
+                                table.reload('article_list', {
+                                    url: './api/get_kw_page_list.php',
+                                    where: {
+                                        'siteid': $('#sel_site').val(),
+                                        'isupload': $('#sel_isupload').val()
+                                    } //设定异步数据接口的额外参数
+                                });
+                                layer.close(index);
+                            }
+                        });
+                    });
+                } else { //删除
+                    layer.confirm('确定要删除？？', function (index) {
+                        obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                        layer.close(index);
+                        $.get('./api/keyword_delete.php', { id: obj.data.id });
+                    });
+                }
+            });
+            //监听头部按钮
+            table.on('toolbar(table)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                switch (obj.event) {
+                    case 'delete':
+                        if (!checkStatus.data.length) {
+                            layer.msg('请选择要删除的文章', {
+                                time: 20000, //20s后自动关闭
+                                btn: ['确定']
+                            });
+                        } else {
+                            layer.confirm('确定要删除？？', function (index) {
+                                var art_list = [];
+                                var art_data = checkStatus.data;
+                                for (var j in checkStatus.data) {
+                                    art_list.push(art_data[j].id);
+                                }
+                                var art_str = art_list.join(',');
+                                layer.close(index);
+                                $.get('./api/keyword_delete.php', { id: art_str }, function () {
+                                    table.reload('article_list', {
+                                        url: './api/get_kw_page_list.php',
+                                        where: {
+                                            'siteid': $('#sel_site').val(),
+                                            'isupload': $('#sel_isupload').val()
+                                        } //设定异步数据接口的额外参数
+                                    });
+                                });
+                            });
+                        }
+                        break;
+                    case 'import':
+                        layer.open({
+                            type: 2,
+                            title: '关键词导入',
+                            area: ['80%', '80%'],
+                            shade: 0,
+                            maxmin: true,
+                            offset: 'auto',
+                            content: './keywords_import.php',
+                            btn: ['确定', '取消'],
+                            shade: [0.4, '#393D49'],
+                            btn1: function (index, layero) {
+                                var kw_temp_arr = [];
+                                var kw_arr = [];
+                                var son = layero.find("iframe")[0].contentWindow;
+                                var keywrds_content = son.keywrds_content;
+
+                                keywrds_content.children('div').each(function(){
+                                    kw_temp_arr.push($(this).text());
+                                });
+                                if(keywrds_content.html()[0] !== '<'){
+                                    keywrds_content.children('div').remove();
+                                    keywrds_content.html('<div>'+keywrds_content.html()+'</div>');
+                                    for(var i in kw_temp_arr){
+                                        keywrds_content.append('<div>'+kw_temp_arr[i]+'</div>');
+                                    }
+                                }
+
+                                keywrds_content.children('div').each(function(){
+                                    kw_arr.push($.trim($(this).text()));
+                                });
+                            
+                                kw_str = kw_arr.join();
+                                var siteid = son.siteid.val();
+                                var site = son.siteid.next().find('input').val();
+                                if(!kw_str || !siteid || !site){
+                                    layer.msg('信息未填写完整', {
+                                        time: 2000000, //20s后自动关闭
+                                        btn: ['确定'],
+                                        zIndex: layer.zIndex * 1000000,
+                                    });
+                                    return false;
+                                }
+
+                                var loading = layer.load(0, {
+                                    shade: false,
+                                    time: 30 * 1000
+                                });
+                                $.ajax({
+                                    url: './api/keywords_save.php',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        keywords: kw_str,
+                                        siteid: siteid,
+                                        site: site
+                                    },
+                                    success: function (res) {
+                                        if(res.code !== 219){
+                                            layer.msg('上传失败', {
+                                                time: 20000, //20s后自动关闭
+                                                btn: ['确定'],
+                                                zIndex: layer.zIndex * 1000000
+                                            });
+                                            return false;
+                                        }
+                                        table.reload('article_list', {
+                                            url: './api/get_kw_page_list.php',
+                                            where: {
+                                                'siteid': $('#sel_site').val(),
+                                                'isupload': $('#sel_isupload').val()
+                                            } //设定异步数据接口的额外参数
+                                        });
+                                        layer.closeAll();
+                                    },
+                                    error: function () {
+                                        layer.msg('服务器连接失败', {
+                                            time: 20000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000
+                                        });
+                                    }
+                                });
+                            },
+                            btn2: function () {
+                                layer.closeAll();
+                            },
+                            zIndex: layer.zIndex,
+                            success: function () {   //弹出后执行
+                            }
+                        });
+                        break;
+                };
+            });
+        });
+    </script>
+</body>
+
+</html>

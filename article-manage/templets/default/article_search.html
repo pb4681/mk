@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>麦开信息管理系统 - Article_Search</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white">
+    <div class="form-wrapper">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">采集url</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="url" required lay-verify="required" placeholder="输入采集目标的url地址" autocomplete="off" class="layui-input"
+                        id="url">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">类别选择</label>
+                <div class="layui-input-inline my-text-input-250">
+                    <select name="industry" lay-verify="required" lay-filter="industry" id="industry">
+                        <option value=""></option>
+                        <option value="1001">办公家具（www.pinyuan.cc）</option>
+                        <option value="1002">办公设备（www.pinyuan.cc）</option>
+                        <option value="1003">儿童家具（children.pinyuan.cc）</option>
+                        <option value="1004">学校家具（school.pinyuan.cc）</option>
+                        <option value="1005">医院家具（hospital.pinyuan.cc）</option>
+                        <option value="1006">图书馆家具（library.pinyuan.cc）</option>
+                        <option value="1007">高端办公家具（office.pinyuan.cc）</option>
+                        <option value="1008">公寓家具（apartment.pinyuan.cc）</option>
+                        <option value="1009">餐厅家具（restaurant.pinyuan.cc）</option>
+                        <option value="1010">酒店家具（hotel.pinyuan.cc）</option>
+                        <option value="1011">零售家具（shelf.pinyuan.cc）</option>
+                        <option value="1012">智美综合（www.zmshoo.com）</option>
+                        <option value="1013">新风净化（cleaner.zmshoo.com）</option>
+                        <option value="1014">净水系统（water.zmshoo.com）</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">断点数值</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="break" placeholder="断点offset数值" autocomplete="off" class="layui-input" id="break">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="margin-left: 90px;">
+                    <button class="layui-btn" lay-submit lay-filter="formsearch" id="submit">立即提交</button>
+                    <button class="layui-btn" lay-submit lay-filter="formsearchbreak" id="submit_break">断点提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    <script>
+        layui.use(['form', 'layer'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+            var $ = layui.$;
+            form.on('submit(formsearch)', function (data) {
+                var url = data.field.url;
+                var industry = data.field.industry;
+                var str_del = url.match(/&offset=(.+?)&/g)[0];
+                var fakeid_64 = url.match(/&__biz=(.+?)&/g)[0];
+                str_del = str_del.substring(0, str_del.length - 1);
+                fakeid_64 = fakeid_64.substring(7, fakeid_64.length - 1);
+                url = url.replace(str_del, '');
+                fakeid_test(fakeid_64, url, industry, 0);
+                return false;
+            });
+            form.on('submit(formsearchbreak)', function (data) {
+                var url = data.field.url;
+                var industry = data.field.industry;
+                var offset = data.field.break;
+                var str_del = url.match(/&offset=(.+?)&/g)[0];
+                var fakeid_64 = url.match(/&__biz=(.+?)&/g)[0];
+                str_del = str_del.substring(0, str_del.length - 1);
+                fakeid_64 = fakeid_64.substring(7, fakeid_64.length - 1);
+                url = url.replace(str_del, '');
+                fakeid_test(fakeid_64, url, industry, offset);
+                return false;
+            });
+            function fakeid_test(fakeid_64, url, industry, offset) {
+                $.ajax({
+                    url: './api/fakeid_test.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        fakeid64: fakeid_64
+                    },
+                    success: function (data) {
+                        if (data.code === 209) {
+                            offset = data.data;
+                            insert_article(url, industry, offset)
+                        }
+                        if (data.code === 210) {
+                            offset = 0;
+                            insert_article(url, industry, offset)
+                        }
+                    },
+                    error: function () {
+                        layer.msg('服务器连接失败', {
+                            time: 20000, //20s后自动关闭
+                            btn: ['确定']
+                        });
+                    }
+                });
+            }
+            function insert_article(url, industry, offset) {
+                $.ajax({
+                    url: './api/get_article_list.php',           //获取文章列表
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        url: url,
+                        offset: offset
+                    },
+                    success: function (data) {
+                        var offset = data.next_offset;             //下次采集位置
+                        var is_remain = data.can_msg_continue;     //是否还有剩余 0,1
+                        var data = JSON.parse(data.general_msg_list);
+                        var list = data.list;      //获取数据数组
+                        var x = 0;
+                        to_db();
+                        // 处理内容分批入库
+                        function to_db() {
+                            if (x >= list.length) {
+                                if (is_remain) {
+                                    insert_article(url, industry, offset);
+                                } else {
+                                    layui.use('layer', function () {
+                                        var layer = layui.layer;
+                                        layer.msg('文章采集完成');
+                                    });
+                                }
+                                return;
+                            }
+                            try {
+                                var fakeid = list[x].comm_msg_info.fakeid;               //公众号 id
+                                var aid = list[x].comm_msg_info.id;                      //文章 id
+                                var title = list[x].app_msg_ext_info.title;              //文章标题
+                                var digest = list[x].app_msg_ext_info.digest;            //文章摘要
+                                var datetime = list[x].comm_msg_info.datetime;           //发文时间戳
+                                var content_url = list[x].app_msg_ext_info.content_url;  //文章url
+                            }
+                            catch (err) {
+                                x++;
+                                to_db();
+                            }
+                            $.ajax({
+                                url: './api/get_article_content.php',           //获取文章内容，入库
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    fakeid: fakeid,
+                                    industry: industry,
+                                    aid: aid,
+                                    title: title,
+                                    digest: digest,
+                                    datetime: datetime,
+                                    content_url: content_url,
+                                    offset: offset
+                                },
+                                success: function (data) {
+                                    if (data.code === 200) {
+                                        x++;
+                                        to_db();
+                                    }
+                                },
+                                error: function () {
+                                    layui.use('layer', function () {
+                                        var layer = layui.layer;
+                                        layer.msg('文章入库失败');
+                                    });
+                                }
+                            });
+                        }
+                    },
+                    error: function () {
+                        layui.use('layer', function () {
+                            var layer = layui.layer;
+                            layer.msg('获取文章列表失败');
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

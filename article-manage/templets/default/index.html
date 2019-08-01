@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>麦开信息管理系统 - Home</title>
+  <link rel="stylesheet" href="./extend/layui/css/layui.css">
+  <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="layui-layout-body">
+  <div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+      <!-- 头部区域（可配合layui已有的水平导航） -->
+      <ul class="layui-nav layui-layout-left">
+        <li class="layui-nav-item" lay-unselect>
+          <a href="javascript:;" id="left_width_desc">
+            <i class="layui-icon layui-icon-shrink-right"></i>
+          </a>
+        </li>
+        <li class="layui-nav-item" lay-unselect>
+          <a href="javascript:;">商品管理</a>
+        </li>
+        <li class="layui-nav-item" lay-unselect>
+          <a href="javascript:;" id="refresh">
+            <i class="layui-icon layui-icon-refresh-3"></i>
+          </a>
+        </li>
+        <li class="layui-nav-item" lay-unselect>
+          <a href="javascript:;">其它系统</a>
+          <dl class="layui-nav-child">
+            <dd lay-unselect>
+              <a href="javascript:;">邮件管理</a>
+            </dd>
+            <dd lay-unselect>
+              <a href="javascript:;">消息管理</a>
+            </dd>
+            <dd lay-unselect>
+              <a href="javascript:;">授权管理</a>
+            </dd>
+          </dl>
+        </li>
+      </ul>
+      <ul class="layui-nav layui-layout-right">
+        <li class="layui-nav-item" lay-unselect>
+          <a href="javascript:;">
+            <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+            <?php echo $nickname; ?>
+          </a>
+          <dl class="layui-nav-child">
+            <dd lay-unselect>
+              <a href="javascript:;">基本资料</a>
+            </dd>
+            <dd lay-unselect>
+              <a href="javascript:;">安全设置</a>
+            </dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item" lay-unselect>
+          <a href="javascript:;" id="login_out">退出</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+      <div class="layui-side-scroll">
+        <div class="layui-logo">
+          <span>MkAdmin</span>
+        </div>
+        <ul class="layui-nav layui-nav-tree" lay-filter="test">
+          <?php if($authority===1||$authority===2)
+          { echo 
+          '<li class="layui-nav-item">
+            <a class="" href="javascript:;">
+              <i class="layui-icon layui-icon-read"></i>
+              <em>文章</em>
+            </a>
+            <dl class="layui-nav-child">
+              <dd>
+                <a href="javascript:;" data-url="./article_display.php">文章库</a>
+              </dd>
+              <dd>
+                <a href="javascript:;" data-url="./article_relation.php">所属关系</a>
+              </dd>'; 
+            if($authority===1)
+            { echo 
+              '<dd>
+                  <a class="" href="javascript:;" data-url="./article_search.php">文章采集</a>
+               </dd>';
+            }
+            if($authority===1||$authority===2)
+            { echo 
+              '<dd>
+                  <a class="" href="javascript:;" data-url="./keywords_display.php">关键词库</a>
+               </dd>';
+            }
+            echo 
+            '</dl>
+          </li>'; 
+            echo
+          '<li class="layui-nav-item">
+            <a href="javascript:;">
+              <i class="layui-icon layui-icon-component"></i>
+              <em>产品</em>
+            </a>
+            <dl class="layui-nav-child">
+              <dd>
+                <a href="javascript:;" data-url="./product_display.php">产品库</a>
+              </dd>';
+            if($authority===1)
+            { echo
+              '<dd>
+                <a href="javascript:;" data-url="./product_templet.php">产品模板</a>
+              </dd>';
+            }
+            echo 
+            '</dl>
+          </li>'; 
+          }
+          if($authority===1||$authority===3)
+          { echo
+          '<li class="layui-nav-item">
+            <a href="javascript:;">
+              <i class="layui-icon layui-icon-reply-fill"></i>
+              <em>询盘</em>
+            </a>
+            <dl class="layui-nav-child">
+              <dd>
+                <a href="javascript:;" data-url="./ask_display.php">询盘列表</a>
+              </dd>
+            </dl>
+          </li>'; 
+          }
+          if($authority===1)
+          { echo
+          '<li class="layui-nav-item">
+            <a href="javascript:;" data-url="./user_manage.php">
+              <i class="layui-icon layui-icon-user"></i>
+              <em>权限</em>
+            </a>
+          </li>
+          <li class="layui-nav-item">
+            <a href="javascript:;" data-url="./query_order.php">
+              <i class="layui-icon layui-icon-search"></i>
+              <em>排名</em>
+            </a>
+          </li>';
+          }
+          ?>
+        </ul>
+      </div>
+    </div>
+    <!-- 选项卡 -->
+    <div class="layui-tab" lay-allowClose="true" lay-filter="option">
+      <ul class="layui-tab-title">
+      </ul>
+      <div class="layui-tab-content my-tab-content">
+      </div>
+    </div>
+  </div>
+  <script src="./extend/layui/layui.js"></script>
+  <script>
+    layui.use('element', function () {
+      var element = layui.element;
+      var $ = layui.$;
+      $('.layui-nav-tree a').click(function () {
+        if ($(this).parents('.layui-nav-item').find('dl').length && $('#left_width_desc').find('.layui-icon-spread-left').length) {
+          $('#left_width_desc').click();
+        }
+        if ($(this).html().indexOf('layui-nav-more') === -1) {
+          var name = $.trim($(this).text());
+          var url = $(this).data('url');
+          var a = 0;
+          if ($('.layui-tab-title li').length) {         //判断是否存在初始选项卡
+            $('.layui-tab-title li').each(function () {
+              if ($(this).attr('lay-id') === name) {     //判断该选项卡是否存在
+                a++;
+              }
+            });
+            if (a) {                                     //存在，直接切换
+              element.tabChange('option', name);
+            } else {                                     //不存在，新增并切换
+              element.tabAdd('option', {
+                title: name,
+                content: '<iframe src="' + url + '" frameborder="0"></iframe>',
+                id: name
+              });
+              element.tabChange('option', name);
+            }
+          } else {                                      //不存在初始选项卡，新增并且换
+            element.tabAdd('option', {
+              title: name,
+              content: '<iframe src="' + url + '" frameborder="0"></iframe>',
+              id: name
+            });
+            element.tabChange('option', name);
+          }
+        }
+      });
+      element.on('tab(option)', function (data) {     //选项卡切换
+        var name = this.getAttribute('lay-id');
+        $('.layui-side-scroll .layui-nav dd,.layui-nav-item').removeClass('layui-this');
+        $('.layui-side-scroll .layui-nav .layui-nav-item a').each(function () {
+          if ($.trim($(this).text()) === name) {
+            if ($(this).parents('.layui-nav-item').find('dl').length && $('#left_width_desc').find('.layui-icon-spread-left').length) {
+              $('#left_width_desc').click();
+            }
+            $(this).parent().addClass('layui-this');
+            $('.layui-side-scroll .layui-nav li').removeClass('layui-nav-itemed');
+            $(this).parents('.layui-nav-item').addClass('layui-nav-itemed');
+          }
+        });
+      });
+      $('#refresh').click(function () {               //iframe刷新
+        $('.layui-tab-content .layui-show').find("iframe")[0].contentWindow.location.reload(true);
+      });
+      $('.layui-side-scroll .layui-nav li').click(function () {
+        if ($(this).attr('class').indexOf('layui-nav-itemed') !== -1) {
+          $('.layui-side-scroll .layui-nav li').removeClass('layui-nav-itemed');
+          $(this).addClass('layui-nav-itemed');
+        } else {
+          $(this).removeClass('layui-nav-itemed');
+        }
+      });
+      var __index;
+      $('#left_width_desc').click(function () {       //侧边栏伸缩
+        if ($(this).find('i').attr('class').indexOf('right') > -1) {
+          $('.layui-side-scroll .layui-nav li').each(function () {
+            if ($(this).attr('class').indexOf('layui-nav-itemed') > -1) {
+              __index = $(this).index();
+            }
+          });
+          $(this).find('i').attr('class', 'layui-icon layui-icon-spread-left');
+          $('.layui-nav-item a em').css('display', 'none');
+          $('.layui-side-scroll .layui-nav li').removeClass('layui-nav-itemed');
+          $('.layui-layout-admin .layui-logo span').text('MK');
+          $('.layui-layout-admin .layui-side,.layui-layout-admin .layui-logo').stop().animate({ 'width': '60px' });
+          $('.layui-layout-left,.layui-tab,.my-tab-content').stop().animate({ 'left': '60px' });
+        } else {
+          $(this).find('i').attr('class', 'layui-icon layui-icon-shrink-right');
+          $('.layui-nav-item a em').css('display', 'inline');
+          $('.layui-side-scroll .layui-nav li').eq(__index).addClass('layui-nav-itemed');
+          $('.layui-layout-admin .layui-logo span').text('MkAdmin');
+          $('.layui-layout-admin .layui-side,.layui-layout-admin .layui-logo').stop().animate({ 'width': '200px' });
+          $('.layui-layout-left,.layui-tab,.my-tab-content').stop().animate({ 'left': '200px' });
+        }
+      });
+      $('#login_out').click(function () {
+        $.get('./api/login_out.php', function () {
+          location.reload();
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

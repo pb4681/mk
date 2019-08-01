@@ -1,0 +1,100 @@
+/* layui 重置 css样式 */
+.layui-tab-title .layui-this:after{border-bottom-color: #e6e6e6;background: rgba(0,0,0,0.05);border-width: 0;border-top: 2px solid;}
+.layui-tab{position: fixed;top: 49px;left: 200px;right: 0;margin: 0;background: #fff;}
+.layui-tab-title{box-shadow: 0 1px 4px 0 rgba(0,0,0,.05);z-index: 1000;}
+.layui-table-fixed-r{box-shadow: none;}
+.layui-table-body{width: 100%;overflow-x: hidden;}
+.layui-side{z-index: 1001;}
+.layui-side-scroll{width: 100%;}
+.layui-bg-black{background: #23262E!important;}
+.layui-nav{background: #23262E;}
+.layui-nav-item a em{padding-left: 10px;}
+.layui-layout-admin .layui-layout-left{padding: 0 10px;}
+.layui-header{height: 49px;}
+.layui-nav-child{top: 47px;}
+.layui-form-label{width: 65px;}
+.layui-layer,.layui-layer-shade{z-index: 1000;}
+.layui-layer-hui{color: #fff!important;background-color: rgba(0,0,0,.6)!important;z-index: 10000000000!important;}
+.layui-layout-admin .layui-header{background: #fff;border-bottom: 1px solid #f6f6f6;}
+.layui-layout-left .layui-nav-item a,.layui-layout-right .layui-nav-item a{color: #333;}
+.layui-layout-left .layui-nav-item a:hover,.layui-layout-right .layui-nav-item a:hover{color: #333;}
+.layui-nav .layui-nav-item{line-height: 49px;}
+.layui-layout-admin .layui-side{top: 49px;}
+.layui-header .layui-nav .layui-this:after,.layui-header .layui-nav .layui-nav-bar, .layui-nav-tree .layui-nav-itemed:after{top: 0!important;height: 2px;}
+.layui-layout-admin .layui-logo{position: fixed;left: 0;top: 0;z-index: 1002;width: 200px;height: 49px;line-height: 49px;padding: 0 15px;box-sizing: border-box;overflow: hidden;font-weight: 300;background-repeat: no-repeat;background-position: center center;border-bottom: 1px solid #232323;background-color: #23262E;}
+.layui-layer-btn .layui-layer-btn1{background: #009688;border-color: #009688;color: #fff;}
+.layui-layer-btn .layui-layer-btn2{background: #FF5722;border-color: #FF5722;color: #fff;}
+.layui-nav-tree .layui-nav-child a{padding-left: 47px;}
+/* my css */
+em{font-style: normal;}
+#login{position: absolute;width: 100%;height: 100%;background-image: url(../img/login_bg.jpg);background-size: cover;background-attachment: fixed;}
+iframe{width: 100%;height: 100%;background: #F2F2F2;}
+body.bg-white{background: #fff;box-sizing: border-box;}
+body.child-white{padding: 15px;}
+body.extend{padding: 0;position: absolute;left: 0;top: 0;bottom: 0;right: 0;}
+body.extend>div.form-wrapper{position: absolute;width: 100%;box-sizing: border-box;padding-top: 20px;}
+body.child-white>div{background: #fff;}
+body.child-white>div.layui-layer-loading{background: 0 0;}
+.body-content{position: absolute;left: 0;right: 0;top: 0;bottom: 0;background: #f3f3f3;}
+#login input{border: 0;}
+#login #lg_btn{display: block;width: 70%;margin: 70px auto 0;background: #1ebfec;border-radius: 19px;}
+#login .layui-form-item{width: 70%;margin: 0 auto;border-bottom: 1px solid #ccc;margin-bottom: 30px;}
+#login .layui-form-label{width: auto;}
+.mk-login-wrapper{width: 800px;height: 500px;position: absolute;left: 50%;top: 50%;margin-left: -400px;margin-top: -250px;}
+.mk-login-wrapper .mk-login-left{float: left;width: 50%;height: 500px;text-align: center;background: rgba(255, 255, 255, .2)}
+.mk-login-wrapper .mk-login-form{float: left;width: 50%;height: 500px;background: #fff;}
+.mk-login-wrapper .mk-login-form .layui-form{margin-top: 106px;}
+.mk-login-wrapper .mk-login-left .text{color: #fff;text-align: left;margin: 215.5px 0 0 100px;}
+.mk-login-wrapper .mk-login-form .code{width: 120px;}
+.mk-login-wrapper .mk-login-form .code input{width: 100%;}
+.mk-login-wrapper .mk-login-form .img-code{display: inline;cursor: pointer;}
+.my-tab-content{position: fixed;left: 200px;right: 0;top: 90px;bottom: 0;padding: 0;}
+.my-tab-content .layui-show{position: absolute;width: 100%;height: 100%;}
+.my-form-item{display: inline-block;vertical-align: top;}
+.isupload-form-item{margin-left: 50px;}
+.my-label{width: auto;}
+.my-select{width: 250px;margin-left: 90px;}
+.isupload-select{width: 140px;}
+.form-wrapper{border-bottom: 1px solid #f6f6f6;padding: 15px;}
+.table{padding: 5px 15px 15px;}
+.layui-form-item #content{width: 600px;height: 650px;overflow-y: auto;border: 1px solid #e6e6e6;}
+.layui-form-item #content p{padding: 10px;margin: 10px 0;background: #c7edcc;}
+.layui-form-item #content p:first-child{margin-top: 0;}
+.layui-form-item #content p.blue{background: #85f8ff;}
+.layui-form-item #content p:hover{background: #7aea89;cursor: pointer;}
+.layui-form-item .templet-item{width: 600px;height: 125px;overflow-y: auto;border: 1px solid #e6e6e6}
+.layui-form-item .my-text-input{width: 350px;}
+.layui-form-item .my-text-input-digest{width: 500px;}
+.layui-form-item .my-text-input-250{width: 250px;}
+.layui-form-item .my-text-input-600{width: 600px;}
+.layui-layout-admin .layui-logo span{color: rgba(255,255,255,.8);}
+#edit_erea{overflow-y: auto;}
+#edit_erea p{cursor: pointer;padding: 5px 0;}
+#edit_erea p:hover{background: #85f8ff;}
+#edit_erea p.bg-blue{background: #85f8ff;}
+.templet .layui-form-label{width: 140px;}
+#code{overflow-y: auto;}
+.layui-form-item .code-area{display: block;width: 100%;}
+lk-dom{display: block;}
+.ques-list{margin-bottom: 10px;}
+.input-upload{width: 400px;height: 25px;}
+.img-upload{margin: 5px 10px 5px 0!important;}
+.pro-top-area{padding: 20px;border: 1px solid #ccc;margin-bottom: 20px;}
+.layui-form-item .pro-title{width: 450px;}
+.layui-form-item .pro-keyword{width: 350px;}
+.layui-form-item .pro-description{width: 650px;}
+.ques-list input{display: block;}
+.size-img input:nth-child(2){display: block;}
+#main{height: 800px;}
+.add-input{display: none;}
+.img-preview{position: fixed;top: 50px;right: 50px;cursor: pointer;}
+.img-prv{width: 90%!important;height: auto!important;margin: auto!important;top: 0;bottom: 0;left: 0;right: 0;}
+.img-prv img{width: auto;height: auto;max-height: 600px;position: absolute;margin: auto;top: 0;bottom: 0;left: 0;right: 0;}
+.img-prv .size{position: absolute;font-size: 18px;width: 120px;left: 50%;margin-left: -60px;top: 20px;text-align: center;}
+.layui-form-item #kw_content{width: 600px;height: 450px;overflow-y: auto;border: 1px solid #e6e6e6;}
+.layui-layer-shade{z-index: 1000!important;}
+.layui-layer-iframe{z-index: 1005!important;}
+.layui-layer-dialog{z-index: 1010!important;}
+@media screen and (max-width: 1100px){
+.layui-layer-iframe{overflow-y: hidden!important;}
+}

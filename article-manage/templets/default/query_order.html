@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>麦开信息管理系统 - Query_Order</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white">
+    <div class="form-wrapper">
+        <form class="layui-form" action="./api/query_order.php">
+            <div class="layui-form-item">
+                <label class="layui-form-label">关键词</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="keyword" required lay-verify="required" placeholder="输入关键词" autocomplete="off" class="layui-input"
+                        id="keyword">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">页码值</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="pagenum" required lay-verify="required" placeholder="输入页码最大值" autocomplete="off" class="layui-input"
+                        id="pagenum">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="margin-left: 95px;">
+                    <button class="layui-btn" lay-submit lay-filter="formsearch" id="submit">确定</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    
+    <script>
+        layui.use(['form', 'layer'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+            var $ = layui.$;
+            form.on('submit(formsearch)', function (data) {
+                
+            });
+        });
+    </script>
+</body>
+
+</html>

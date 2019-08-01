@@ -1,0 +1,310 @@
+错误SQL语句：
+SELECT count(id) FROM product WHERE siteid=1001 AND isupload=1AND cat=57
+客户IP:127.0.0.1
+时间 :2019-07-31 15:28:24
+
+错误SQL语句：
+SELECT * FROM product WHERE siteid=1001 AND isupload=1AND cat=57 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:28:24
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE siteid=1001 AND isupload=2AND cat=57
+客户IP:127.0.0.1
+时间 :2019-07-31 15:28:25
+
+错误SQL语句：
+SELECT * FROM product WHERE siteid=1001 AND isupload=2AND cat=57 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:28:25
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE siteid=1001 AND isupload=1AND cat=57
+客户IP:127.0.0.1
+时间 :2019-07-31 15:28:26
+
+错误SQL语句：
+SELECT * FROM product WHERE siteid=1001 AND isupload=1AND cat=57 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:28:26
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE siteid=1001 AND isupload=1AND catid=57
+客户IP:127.0.0.1
+时间 :2019-07-31 15:28:59
+
+错误SQL语句：
+SELECT * FROM product WHERE siteid=1001 AND isupload=1AND catid=57 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:28:59
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE siteid=1001 AND isupload=1AND catid=59
+客户IP:127.0.0.1
+时间 :2019-07-31 15:29:01
+
+错误SQL语句：
+SELECT * FROM product WHERE siteid=1001 AND isupload=1AND catid=59 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:29:01
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE siteid=1001 AND isupload=1AND catid=57
+客户IP:127.0.0.1
+时间 :2019-07-31 15:29:03
+
+错误SQL语句：
+SELECT * FROM product WHERE siteid=1001 AND isupload=1AND catid=57 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:29:03
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE siteid=1001 AND isupload=2AND catid=57
+客户IP:127.0.0.1
+时间 :2019-07-31 15:30:07
+
+错误SQL语句：
+SELECT * FROM product WHERE siteid=1001 AND isupload=2AND catid=57 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:30:07
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE siteid=1001 AND isupload=1AND catid=57
+客户IP:127.0.0.1
+时间 :2019-07-31 15:30:09
+
+错误SQL语句：
+SELECT * FROM product WHERE siteid=1001 AND isupload=1AND catid=57 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:30:09
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE siteid=1001 AND isupload=1AND cat=57
+客户IP:127.0.0.1
+时间 :2019-07-31 15:35:52
+
+错误SQL语句：
+SELECT * FROM product WHERE siteid=1001 AND isupload=1AND cat=57 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:35:52
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:38:43
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:38:43
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:39:39
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:39:39
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE siteid=1001 AND isupload=1AND cat=57
+客户IP:127.0.0.1
+时间 :2019-07-31 15:40:24
+
+错误SQL语句：
+SELECT * FROM product WHERE siteid=1001 AND isupload=1AND cat=57 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:40:24
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE siteid=1001 AND isupload=1AND cat=57
+客户IP:127.0.0.1
+时间 :2019-07-31 15:40:41
+
+错误SQL语句：
+SELECT * FROM product WHERE siteid=1001 AND isupload=1AND cat=57 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:40:41
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:44:57
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:44:57
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:00
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:00
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:12
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:12
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:14
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:14
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:16
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:16
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:19
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:19
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:28
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:45:28
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:48:27
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:48:27
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:48:29
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:48:29
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:54:01
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:54:01
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 15:54:09
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 15:54:09
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE  AND isupload=1 AND catid=66
+客户IP:127.0.0.1
+时间 :2019-07-31 16:08:20
+
+错误SQL语句：
+SELECT * FROM product WHERE  AND isupload=1 AND catid=66 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 16:08:20
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE  AND isupload=2 AND catid=66
+客户IP:127.0.0.1
+时间 :2019-07-31 16:08:21
+
+错误SQL语句：
+SELECT * FROM product WHERE  AND isupload=2 AND catid=66 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 16:08:21
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE  AND isupload=1 AND catid=66
+客户IP:127.0.0.1
+时间 :2019-07-31 16:08:22
+
+错误SQL语句：
+SELECT * FROM product WHERE  AND isupload=1 AND catid=66 ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 16:08:22
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 16:09:12
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 16:09:12
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 16:09:16
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 16:09:16
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 16:09:18
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 16:09:18
+
+错误SQL语句：
+SELECT count(id) FROM product WHERE 
+客户IP:127.0.0.1
+时间 :2019-07-31 16:52:19
+
+错误SQL语句：
+SELECT * FROM product WHERE  ORDER BY id DESC LIMIT 0,10
+客户IP:127.0.0.1
+时间 :2019-07-31 16:52:19
+

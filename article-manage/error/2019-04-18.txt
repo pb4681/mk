@@ -1,0 +1,20 @@
+错误SQL语句：
+SELECT count(id) FROM keyword
+客户IP:58.34.243.155
+时间 :2019-04-18 15:01:33
+
+错误SQL语句：
+SELECT * FROM keyword ORDER BY id LIMIT 0,10
+客户IP:58.34.243.155
+时间 :2019-04-18 15:01:33
+
+错误SQL语句：
+INSERT INTO keyword (siteid,site,keyword,isupload,importtime) VALUE (1001,'办公家具（www.pinyuan.cc）','第三方是的发',1,1555577286)
+客户IP:58.34.243.155
+时间 :2019-04-18 16:48:06
+
+错误SQL语句：
+INSERT INTO keyword (siteid,site,keyword,isupload,importtime) VALUE (1001,'办公家具（www.pinyuan.cc）','第三方是的发',1,1555578117)
+客户IP:58.34.243.155
+时间 :2019-04-18 17:01:58
+

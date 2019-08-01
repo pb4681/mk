@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>麦开信息管理系统 - Product_Display</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white">
+    <div class="form-wrapper">
+        <form class="layui-form">
+            <a class="layui-btn" id="edit">编辑模板</a>
+            <div class="layui-form-item my-form-item">
+                <label class="layui-form-label my-label">网站选择</label>
+                <div class="layui-input-block my-select">
+                    <select name="site" lay-verify="required" lay-filter="site" id="site">
+                        <option value=""></option>
+                        <option value="1001">办公家具（www.pinyuan.cc）</option>
+                        <option value="1002">办公设备（www.pinyuan.cc）</option>
+                        <option value="1003">办公家具厂（www.china-pinyuan.com）</option>
+                        <option value="1004">儿童家具（children.pinyuan.cc）</option>
+                        <option value="1005">学校家具（school.pinyuan.cc）</option>
+                        <option value="1006">医院家具（hospital.pinyuan.cc）</option>
+                        <option value="1007">图书馆家具（library.pinyuan.cc）</option>
+                        <option value="1008">办公家具装修（office.pinyuan.cc）</option>
+                        <option value="1009">公寓家具（apartment.pinyuan.cc）</option>
+                        <option value="1010">餐厅家具（restaurant.pinyuan.cc）</option>
+                        <option value="1011">酒店家具（hotel.pinyuan.cc）</option>
+                        <option value="1012">零售家具（shelf.pinyuan.cc）</option>
+                        <option value="1013">智美综合（www.zmshoo.com）</option>
+                        <option value="1014">新风净化（cleaner.zmshoo.com）</option>
+                        <option value="1015">净水系统（water.zmshoo.com）</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+        <pre class="layui-code">
+        </pre>
+    </div>
+
+    <script src="./extend/layui/layui.js"></script>
+    <script>
+        layui.use(['form', 'layer', 'code'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+            var $ = layui.$;
+            layui.code({
+            });
+            $.get('./api/get_code_templet.php', { siteid: 1001 }, function (data) {
+                var reg = /<lk-dom>([\s\S]*?)<\/lk-dom>/g;
+                var li_content_arr = data.data.match(reg);
+                for (var i = 0; i < li_content_arr.length; i++) {
+                    $('.layui-code-ol').append('<li></li>');
+                }
+                $('.layui-code-ol li').each(function () {
+                    var index = $(this).index();
+                    if (li_content_arr[index] !== undefined) {
+                        $(this).text(li_content_arr[index].substring(8, li_content_arr[index].length - 9));
+                    }
+                    if ($(this).text().indexOf('<span style="white-space:pre">') > -1) {
+                        var a = $(this).text().match(/<span style="white-space:pre">([\s\S]*?)<\/span>/g)[0];
+                        var b = a.substring(30, a.length - 7);
+                        $(this).text($(this).text().replace(/<span style="white-space:pre">([\s\S]*?)<\/span>/g, b));
+                    }
+                });
+            });
+
+            $('#edit').click(function () {
+                layer.open({
+                    type: 2,
+                    title: '代码模板编辑',
+                    area: ['80%', '80%'],
+                    shade: 0,
+                    maxmin: true,
+                    offset: 'auto',
+                    content: './code_templet.php',
+                    btn: ['确定', '取消'],
+                    shade: [0.4, '#393D49'],
+                    btn1: function (index, layero) {
+                        var code_area = layero.find("iframe")[0].contentWindow.code_area;
+                        code_area.find('div').each(function () {
+                            var content = $(this).html();
+                            $(this).after('<lk-dom>' + content + '</lk-dom>');
+                            $(this).remove();
+                        });
+                        code_area = code_area.html();
+                        var loading = layer.load(0, {
+                            shade: false,
+                            time: 30 * 1000
+                        });
+                        $.ajax({
+                            url: './api/code_templet_edit.php',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                code: code_area
+                            },
+                            success: function (data) {
+                                if (data.code === 213) {
+
+                                }
+                                layer.closeAll();
+                            },
+                            error: function () {
+                                layer.msg('服务器连接失败', {
+                                    time: 20000, //20s后自动关闭
+                                    btn: ['确定'],
+                                    zIndex: layer.zIndex * 1000000
+                                });
+                            }
+                        });
+                    },
+                    btn2: function () {
+                        layer.closeAll();
+                    },
+                    zIndex: layer.zIndex,
+                    success: function () {   //弹出后执行
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>麦开信息管理系统 - Product_Edit</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white extend">
+    <div class="form-wrapper">
+        <form class="layui-form">
+            <div class="pro-top-area">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">文章ID</label>
+                    <div class="layui-input-inline pro-id">
+                        <input type="text" name="id" required lay-verify="required" placeholder="请输入文章ID" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux" style="color:red!important;">仅修改文章时需填ID，添加文章不要填！</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">大标题</label>
+                    <div class="layui-input-inline pro-title">
+                        <input type="text" name="title" required lay-verify="required" placeholder="请输入大标题" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">关键词</label>
+                    <div class="layui-input-inline pro-keyword">
+                        <input type="text" name="keyword" required lay-verify="required" value='' autocomplete="on" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">缩略图</label>
+                    <button type="button" class="layui-btn img-upload img-upload-1">
+                        <i class="layui-icon">&#xe67c;</i>上传图片
+                    </button>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">描述</label>
+                    <div class="layui-input-inline pro-description">
+                        <input type="text" name="description" required lay-verify="required" placeholder="请输入描述" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item" style="display: inline-block;">
+                    <label class="layui-form-label">网站选择</label>
+                    <div class="layui-input-inline my-text-input-250">
+                        <select name="site" lay-verify="required" lay-filter="site" id="site">
+                            <option value=""></option>
+                            <option value="1001">办公家具（www.pinyuan.cc）</option>
+                            <option value="1002">办公设备（www.pinyuan.cc）</option>
+                            <option value="1003">办公家具厂（www.china-pinyuan.com）</option>
+                            <option value="1004">儿童家具（children.pinyuan.cc）</option>
+                            <option value="1005">学校家具（school.pinyuan.cc）</option>
+                            <option value="1006">医院家具（hospital.pinyuan.cc）</option>
+                            <option value="1007">图书馆家具（library.pinyuan.cc）</option>
+                            <option value="1008">高端办公家具（office.pinyuan.cc）</option>
+                            <option value="1009">公寓家具（apartment.pinyuan.cc）</option>
+                            <option value="1010">餐厅家具（restaurant.pinyuan.cc）</option>
+                            <option value="1011">酒店家具（hotel.pinyuan.cc）</option>
+                            <option value="1012">零售家具（shelf.pinyuan.cc）</option>
+                            <option value="1013">智美综合（www.zmshoo.com）</option>
+                            <option value="1014">新风净化（cleaner.zmshoo.com）</option>
+                            <option value="1015">净水系统（water.zmshoo.com）</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item" style="display: inline-block;">
+                    <label class="layui-form-label">分类选择</label>
+                    <div class="layui-input-inline my-text-input-250">
+                        <select name="cat" lay-verify="required" lay-filter="cat" id="cat">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                </div>
+				<div class="layui-form-item" style="display: inline-block;">
+					<button class="layui-btn" id="get_keyword">确认</I></button>
+				</div>
+            </div>
+            <div class="edit-wrapper"></div>
+        </form>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    <script>
+        var id, title, keyword, description, site_select, cat_select, pro_content, img_lit, img_arr_len, img_arr, carousel, $;
+        function Iwatch(x) {
+            if (x.previousSibling.toString().indexOf('HTMLImageElement') > -1) {
+                x.previousSibling.setAttribute('alt', x.value);
+            } else {
+				//if(x.previousSibling.innerHTML.indexOf())
+				//console.log(x.previousSibling.innerHTML);
+                x.previousSibling.innerHTML = x.value;
+            }
+        }
+        
+        layui.use(['form', 'layer', 'upload', 'carousel'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+            $ = layui.$;
+            carousel = layui.carousel;
+
+            id = $('.pro-id input');
+            title = $('.pro-title input');
+            keyword = $('.pro-keyword input');
+			//console.log(keyword);
+			
+            description = $('.pro-description input');
+            site_select = $('#site');
+            cat_select = $('#cat');
+			cat_select.change(function(){
+				
+			var selected=$(this).children('option:selected').val();
+			console.log(selected);
+			})
+            pro_content = $('.edit-wrapper');
+			/*
+			title.focusout(function () {
+				var array = title.val().split('_');
+				var str = '品源办公家具有限公司，上海'+array[0]+'定制品牌。'+array[0]+'页面主要提供'+array[0]+'、'+array[1]+'、'+array[2]+'定制、价格、图片、尺寸。品源皮质会议椅高档办公椅，厂家直销，服务上门，全国配送。';
+				keyword.attr('value',array.join(','));
+				description.attr('value',str);
+				var b= $('img.add-input').next();//获取图片
+				//b[0].attr('value','a');
+				//console.log(b[1].val(array[0]));
+				//b[0].attr('value','a');
+				//console.log(b[0].previousSibling.setAttribute('alt',array[0]));
+				
+				//b.val(array[0]);
+				//for(var i=0;i<b.length;i++){
+				//console.log(b[i].previousSibling)
+					b[1].previousSibling.setAttribute('alt', array[0]+'-品源');
+				
+				
+			});
+			*/
+			//var cat_selects=("#cat option:selected");
+			
+			//console.log(cat_selects.val());
+			//setTimeout(function(){
+			//	console.log(cat_select.find("option:selected").text())
+			//},2000);
+                //定义数组
+			var wenjiangui =['实木办公文件柜','板式办公文件柜','钢制办公文件柜','展柜','更衣柜','衣柜'];
+			var yizi = ['老板椅','职员办公椅','礼堂椅','培训椅','等候椅','会议椅','办公网椅'];
+            var bangtai =['板式班台','板式班台'];
+            var safa = ['仿皮沙发','布艺沙发','真皮沙发','异性沙发'];
+
+			var get_keyword = $('#get_keyword');
+            
+
+		    get_keyword.click(function(){
+					var keyword_select=$('.layui-anim-upbit .layui-this')[1].innerHTML;
+					var array = title.val().split('_');
+					console.log(keyword_select);
+                    keyword.attr('value',array.join(','));
+				    var b= $('img.add-input').next();
+                    
+                
+                    switch (array.length){
+                        case 2:
+                        var str = '品源办公家具有限公司，上海'+array[0]+'定制品牌。'+array[0]+'页面主要提供'+array[0]+'、'+array[1]+'定制、价格、图片、尺寸。品源皮质会议椅高档办公椅，厂家直销，服务上门，全国配送。';
+                    description.attr('value',str);
+                    $('.product-details__title .input-upload').val(array[0]);
+                    $('.product-details__description').next().val(array[1]);
+                    $('.bigimg-item:eq(0) .input-upload:eq(2) ').val(array[0]);
+                    $('.bigimg-item:eq(1) .input-upload:eq(2)').val(array[1]);
+					    b[0].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					    b[1].previousSibling.setAttribute('alt', array[1]+'-品源'+keyword_select);
+					    b[2].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					    b[3].previousSibling.setAttribute('alt', array[1]+'-品源'+keyword_select);
+					    b[4].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					    b[5].previousSibling.setAttribute('alt', array[1]+'尺寸-品源'+keyword_select);
+                        
+                        break;
+
+
+                        case 3:
+                        var str = '品源办公家具有限公司，上海'+array[0]+'定制品牌。'+array[0]+'页面主要提供'+array[0]+'、'+array[1]+'、'+array[2]+'定制、价格、图片、尺寸。品源皮质会议椅高档办公椅，厂家直销，服务上门，全国配送。';
+                        description.attr('value',str);
+                        $('.product-details__title .input-upload').val(array[0]);
+                    $('.product-details__description').next().val(array[1]);
+                    $('.bigimg-item:eq(0) .input-upload:eq(2) ').val(array[2]);
+                    $('.bigimg-item:eq(1) .input-upload:eq(2)').val(array[0]);
+                    b[0].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					b[1].previousSibling.setAttribute('alt', array[1]+'-品源'+keyword_select);
+					b[2].previousSibling.setAttribute('alt', array[2]+'-品源'+keyword_select);
+					b[3].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					b[4].previousSibling.setAttribute('alt', array[1]+'-品源'+keyword_select);
+					b[5].previousSibling.setAttribute('alt', array[2]+'尺寸-品源'+keyword_select);
+                        
+                        break;
+                    };
+                    switch (keyword_select) {
+                            case "面板隔断":
+                            $('.input-upload:eq(9)').val('具有丰富的表面色彩和纹路选择。');
+                            $('.input-upload:eq(10)').val('E1级环保三聚氰胺板材或高密度板材，结实耐用承重强，抗菌防潮，表面光滑不易变形，整齐稳固，耐火性好；框架采用优质德国技术设计的铝镁合金型材， 不生锈，不变形。优质进口五金配件，防锈防腐蚀，经久耐用。');
+                            $('.input-upload:eq(11)').val('适用于酒店、办公区、接待区、会议区、培训教室等等。');
+                            $('.mc-small-title').next()[0].textContent='具有丰富的表面色彩和纹路选择。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='E1级环保三聚氰胺板材或高密度板材，结实耐用承重强，抗菌防潮，表面光滑不易变形，整齐稳固，耐火性好；框架采用优质德国技术设计的铝镁合金型材， 不生锈，不变形。优质进口五金配件，防锈防腐蚀，经久耐用。';
+					        $('.mc-small-title').next()[2].textContent='适用于酒店、办公区、接待区、会议区、培训教室等等。';
+                            break;
+                            case "铝合金隔断":
+                            $('.input-upload:eq(9)').val('铝合金型材丰富的色彩选择，纯黑色、氧化银色、炭黑色等，搭配整体效果，美观实用。');
+                            $('.input-upload:eq(10)').val('采用优质德国技术设计的铝镁合金型材，不生锈，不变形。高强度钢化玻璃，耐高温，抗冲击，安全系数高；优质钢架结构，承重强，不易变形；优质进口五金配件，防锈防腐蚀，经久耐用。');
+                            $('.input-upload:eq(11)').val('适用于办公区、接待区、会议区、培训教室等等。');
+                            $('.mc-small-title').next()[0].textContent='铝合金型材丰富的色彩选择，纯黑色、氧化银色、炭黑色等，搭配整体效果，美观实用。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='采用优质德国技术设计的铝镁合金型材，不生锈，不变形。高强度钢化玻璃，耐高温，抗冲击，安全系数高；优质钢架结构，承重强，不易变形；优质进口五金配件，防锈防腐蚀，经久耐用。';
+					        $('.mc-small-title').next()[2].textContent='适用于办公区、接待区、会议区、培训教室等等。';
+                            break;
+                            case "移动隔断":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('E1级环保三聚氰胺板材或高密度板材，结实耐用承重强，抗菌防潮，表面光滑不易变形，整齐稳固，耐火性好；饰面可选用布或者皮革硬包或皮革软包；优质进口五金配件，防锈防腐蚀，经久耐用。优质静音导轨，双轮承重强。');
+                            $('.input-upload:eq(11)').val('适用于办公区、接待区、会议区、培训教室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='E1级环保三聚氰胺板材或高密度板材，结实耐用承重强，抗菌防潮，表面光滑不易变形，整齐稳固，耐火性好；饰面可选用布或者皮革硬包或皮革软包；优质进口五金配件，防锈防腐蚀，经久耐用。优质静音导轨，双轮承重强。';
+					        $('.mc-small-title').next()[2].textContent='适用于办公区、接待区、会议区、培训教室等等。';
+                            break;
+                            case "玻璃隔断":
+                            $('.input-upload:eq(9)').val('铝合金型材丰富的色彩选择，纯黑色、氧化银色、炭黑色等，搭配整体效果，美观实用。');
+                            $('.input-upload:eq(10)').val('高强度钢化玻璃，耐高温，抗冲击，安全系数高；优质钢架结构，承重强，不易变形；框架采用优质德国技术设计的铝镁合金型材，不生锈，不变形。优质进口五金配件，防锈防腐蚀，经久耐用。');
+                            $('.input-upload:eq(11)').val('适用于办公区、接待区、会议区、培训教室等等。');
+                            $('.mc-small-title').next()[0].textContent='铝合金型材丰富的色彩选择，纯黑色、氧化银色、炭黑色等，搭配整体效果，美观实用。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='高强度钢化玻璃，耐高温，抗冲击，安全系数高；优质钢架结构，承重强，不易变形；框架采用优质德国技术设计的铝镁合金型材，不生锈，不变形。优质进口五金配件，防锈防腐蚀，经久耐用。';
+					        $('.mc-small-title').next()[2].textContent='适用于办公区、接待区、会议区、培训教室等等。';
+                            break;
+                            case "艺术隔断":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括颜色和图案都可定制，满足您多种时尚用色需求。');
+                            $('.input-upload:eq(10)').val('E1级环保三聚氰胺板材或不锈钢工艺造型屏风；内置木质或不锈钢框架；，承重强，不易变形；优质进口五金配件，防锈防腐蚀，经久耐用。');
+                            $('.input-upload:eq(11)').val('适用于办公室、接待区、会客厅、展厅、家庭客厅等等。');
+                            $('.mc-small-title').next()[0].textContent='铝合金型材丰富的色彩选择，纯黑色、氧化银色、炭黑色等，搭配整体效果，美观实用。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='E1级环保三聚氰胺板材或不锈钢工艺造型屏风；内置木质或不锈钢框架；，承重强，不易变形；优质进口五金配件，防锈防腐蚀，经久耐用。';
+					        $('.mc-small-title').next()[2].textContent='适用于办公室、接待区、会客厅、展厅、家庭客厅等等。';
+                            break;
+
+
+
+                            case "实木办公茶几":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('E1级环保三聚氰胺板材或高密度板材，结实耐用承重强，抗菌防潮，表面光滑不易变形；冷拉高频钢管台架，耐腐蚀，抗冲击；优质进口五金配件，防锈防腐蚀，经久耐用。优质静音导轨。');
+                            $('.input-upload:eq(11)').val('适用于办公室、接待区、会客厅、家庭客厅等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='E1级环保三聚氰胺板材或高密度板材，结实耐用承重强，抗菌防潮，表面光滑不易变形；冷拉高频钢管台架，耐腐蚀，抗冲击；优质进口五金配件，防锈防腐蚀，经久耐用。优质静音导轨。';
+					        $('.mc-small-title').next()[2].textContent='适用于办公室、接待区、会客厅、家庭客厅等等。';
+                            break;
+                            case "大理石办公茶几":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括鱼肚白、银灰龙、雅士白、黑色等多种高级时尚用色。');
+                            $('.input-upload:eq(10)').val('天然石材，耐高温，易打理；E1级环保三聚氰胺板材，结实耐用承重强，抗菌防潮，表面光滑不易变形；铁艺封铀处理，易清洁，不易刮花；优质进口五金配件，防锈防腐蚀，经久耐用。优质静音导轨。');
+                            $('.input-upload:eq(11)').val('适用于办公室、接待区、会客厅、家庭客厅等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括鱼肚白、银灰龙、雅士白、黑色等多种高级时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='天然石材，耐高温，易打理；E1级环保三聚氰胺板材，结实耐用承重强，抗菌防潮，表面光滑不易变形；铁艺封铀处理，易清洁，不易刮花；优质进口五金配件，防锈防腐蚀，经久耐用。优质静音导轨。';
+					        $('.mc-small-title').next()[2].textContent='适用于办公室、接待区、会客厅、家庭客厅等等。';
+                            break;
+                            case "钢化玻璃茶几":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括黑色、棕色、咖色、红色、茶色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('高强度钢化玻璃，耐高温，抗冲击，安全系数高；优质钢架结构，承重强，不易变形；优质进口五金配件，防锈防腐蚀，经久耐用。');
+                            $('.input-upload:eq(11)').val('适用于办公室、接待区、会客厅、家庭客厅等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括黑色、棕色、咖色、红色、茶色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='高强度钢化玻璃，耐高温，抗冲击，安全系数高；优质钢架结构，承重强，不易变形；优质进口五金配件，防锈防腐蚀，经久耐用。';
+					        $('.mc-small-title').next()[2].textContent='适用于办公室、接待区、会客厅、家庭客厅等等。';
+                            break;
+
+
+                            case "板式办公前台":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('E1级环保三聚氰胺板材，结实耐用承重强，抗菌防潮，表面光滑不易变形；优质进口五金配件，防锈防腐蚀，经久耐用。');
+                            $('.input-upload:eq(11)').val('适用于公司前台、收银台、店铺吧台、美容院前台、医院护士台、健身房接待台、酒店迎宾台等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='E1级环保三聚氰胺板材，结实耐用承重强，抗菌防潮，表面光滑不易变形；优质进口五金配件，防锈防腐蚀，经久耐用。';
+					        $('.mc-small-title').next()[2].textContent='适用于公司前台、收银台、店铺吧台、美容院前台、医院护士台、健身房接待台、酒店迎宾台等等。';
+                            break;
+                            case "实木喷漆前台":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('内部基材选用E1级环保高密度板材，外喷环保木器漆，2道底漆，2道面漆，实木喷漆工艺或钢琴烤漆工艺，光泽亮丽；优质进口五金配件，防锈防腐蚀，经久耐用。');
+                            $('.input-upload:eq(11)').val('适用于公司前台、收银台、店铺吧台、美容院前台、医院护士台、健身房接待台、酒店迎宾台等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='内部基材选用E1级环保高密度板材，外喷环保木器漆，2道底漆，2道面漆，实木喷漆工艺或钢琴烤漆工艺，光泽亮丽；优质进口五金配件，防锈防腐蚀，经久耐用。';
+					        $('.mc-small-title').next()[2].textContent='适用于公司前台、收银台、店铺吧台、美容院前台、医院护士台、健身房接待台、酒店迎宾台等等。';
+                            break;
+
+                            case "老板椅":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('饰面材质：柔软韧性好的头层牛皮或耐磨性好的优质西皮。高背：高密度软弹海绵。座包：海绵、弹簧、乳胶，任意选择，可满足经典、运动或柔软等的需求。框架：工程PP框架，用材环保、经久耐用。底盘：2MM安全防爆底盘，加厚钢板、稳固结实。气压杆：SGS认证气压杆，加厚管壁、安全耐用。承重脚：高承重椅脚，可以选择钢制脚、弓形脚、尼龙椅脚。滑轮：轻音低噪，升级PU轮，防滑耐磨。');
+                            $('.input-upload:eq(11)').val('适用于总裁办公室、总经理办公室、领导办公室、高管办公室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='饰面材质：柔软韧性好的头层牛皮或耐磨性好的优质西皮。高背：高密度软弹海绵。座包：海绵、弹簧、乳胶，任意选择，可满足经典、运动或柔软等的需求。框架：工程PP框架，用材环保、经久耐用。底盘：2MM安全防爆底盘，加厚钢板、稳固结实。气压杆：SGS认证气压杆，加厚管壁、安全耐用。承重脚：高承重椅脚，可以选择钢制脚、弓形脚、尼龙椅脚。滑轮：轻音低噪，升级PU轮，防滑耐磨。';
+					        $('.mc-small-title').next()[2].textContent='适用于总裁办公室、总经理办公室、领导办公室、高管办公室等等。';
+                            break;
+
+                            case "职员办公椅":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('饰面：清爽透气的交织网布、亲肤柔软的棉麻布或耐磨性好的优质西皮；座包：海绵、弹簧、乳胶，任意选择，可满足经典、运动或柔软等的需求；框架：工程PP框架，用材环保、经久耐用；底盘：2MM安全防爆底盘，加厚钢板、稳固结实。气压杆：SGS认证气压杆，加厚管壁、安全耐用；承重脚：高承重椅脚，可以选择钢制脚、弓形脚、尼龙椅脚；滑轮：轻音低噪，升级PU轮，防滑耐磨。');
+                            $('.input-upload:eq(11)').val('适用于职员区、会议区、接待洽谈区、家庭、学生宿舍等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='饰面：清爽透气的交织网布、亲肤柔软的棉麻布或耐磨性好的优质西皮；座包：海绵、弹簧、乳胶，任意选择，可满足经典、运动或柔软等的需求；框架：工程PP框架，用材环保、经久耐用；底盘：2MM安全防爆底盘，加厚钢板、稳固结实。气压杆：SGS认证气压杆，加厚管壁、安全耐用；承重脚：高承重椅脚，可以选择钢制脚、弓形脚、尼龙椅脚；滑轮：轻音低噪，升级PU轮，防滑耐磨。';
+					        $('.mc-small-title').next()[2].textContent='适用于职员区、会议区、接待洽谈区、家庭、学生宿舍等等。';
+                            break;
+                            case "会议椅":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('饰面：清爽透气的交织网布、亲肤柔软的棉麻布或耐磨性好的优质西皮；座包：海绵、弹簧、乳胶，任意选择，可满足经典、运动或柔软等的需求；框架：工程PP框架，用材环保、经久耐用；底盘：2MM安全防爆底盘，加厚钢板、稳固结实。气压杆：SGS认证气压杆，加厚管壁、安全耐用；承重脚：高承重椅脚，可以选择钢制脚、弓形脚、尼龙椅脚；滑轮：轻音低噪，升级PU轮，防滑耐磨。');
+                            $('.input-upload:eq(11)').val('适用于职员区、会议区、接待洽谈区、家庭、学生宿舍等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='饰面：清爽透气的交织网布、亲肤柔软的棉麻布或耐磨性好的优质西皮；座包：海绵、弹簧、乳胶，任意选择，可满足经典、运动或柔软等的需求；框架：工程PP框架，用材环保、经久耐用；底盘：2MM安全防爆底盘，加厚钢板、稳固结实。气压杆：SGS认证气压杆，加厚管壁、安全耐用；承重脚：高承重椅脚，可以选择钢制脚、弓形脚、尼龙椅脚；滑轮：轻音低噪，升级PU轮，防滑耐磨。';
+					        $('.mc-small-title').next()[2].textContent='适用于职员区、会议区、接待洽谈区、家庭、学生宿舍等等。';
+                            break;
+                            case "电脑椅":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('饰面：清爽透气的交织网布、亲肤柔软的棉麻布或耐磨性好的优质西皮；座包：海绵、弹簧、乳胶，任意选择，可满足经典、运动或柔软等的需求；框架：工程PP框架，用材环保、经久耐用；底盘：2MM安全防爆底盘，加厚钢板、稳固结实。气压杆：SGS认证气压杆，加厚管壁、安全耐用；承重脚：高承重椅脚，可以选择钢制脚、弓形脚、尼龙椅脚；滑轮：轻音低噪，升级PU轮，防滑耐磨。');
+                            $('.input-upload:eq(11)').val('适用于职员区、会议区、接待洽谈区、家庭、学生宿舍等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='饰面：清爽透气的交织网布、亲肤柔软的棉麻布或耐磨性好的优质西皮；座包：海绵、弹簧、乳胶，任意选择，可满足经典、运动或柔软等的需求；框架：工程PP框架，用材环保、经久耐用；底盘：2MM安全防爆底盘，加厚钢板、稳固结实。气压杆：SGS认证气压杆，加厚管壁、安全耐用；承重脚：高承重椅脚，可以选择钢制脚、弓形脚、尼龙椅脚；滑轮：轻音低噪，升级PU轮，防滑耐磨。';
+					        $('.mc-small-title').next()[2].textContent='适用于职员区、会议区、接待洽谈区、家庭、学生宿舍等等。';
+                            break;
+                            case "培训椅":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('椅背：全新环保PP料，耐高温、耐磨、耐冲击性，具有良好的抗吸湿性和抗弯曲性。饰面：亲肤柔软、清爽透气的交织网布或耐磨性好的优质西皮。座包：高密度弹性布，透气、弹性好、耐磨。承重脚：高承重椅脚，精钢制造，坚固耐用；PU软垫，防滑，保护地板。');
+                            $('.input-upload:eq(11)').val('适用于会议室、培训场所、会场等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='椅背：全新环保PP料，耐高温、耐磨、耐冲击性，具有良好的抗吸湿性和抗弯曲性。饰面：亲肤柔软、清爽透气的交织网布或耐磨性好的优质西皮。座包：高密度弹性布，透气、弹性好、耐磨。承重脚：高承重椅脚，精钢制造，坚固耐用；PU软垫，防滑，保护地板。';
+					        $('.mc-small-title').next()[2].textContent='适用于会议室、培训场所、会场等等。';
+                            break;
+                            case "礼堂椅":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('饰面：阻燃面料，具有阻燃、抗污、耐磨、透气、防褪色，绿色无毒环保。靠背、座包：高密度冷热定型发泡海绵，高弹力、高回弹。框架：金属扶手框架，扶手面采用橡木或榉木为原料打锣成形。高承重椅脚：冷轧钢脚架，一次成形，结实牢固，表面静电喷涂。');
+                            $('.input-upload:eq(11)').val('适用于电影院、剧院、礼堂等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='饰面：阻燃面料，具有阻燃、抗污、耐磨、透气、防褪色，绿色无毒环保。靠背、座包：高密度冷热定型发泡海绵，高弹力、高回弹。框架：金属扶手框架，扶手面采用橡木或榉木为原料打锣成形。高承重椅脚：冷轧钢脚架，一次成形，结实牢固，表面静电喷涂。';
+					        $('.mc-small-title').next()[2].textContent='适用于电影院、剧院、礼堂等等。';
+                            break;
+                            case "等候椅":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('座包：优质PU材质厚20mm，内加高回弹棉，不变色，绿色无毒环保。框架：全封闭式横梁设计，1.5mm厚冷轧钢压铸，超强承重力，表面经抛光、静电喷涂，耐腐蚀、防生锈。扶手：防锈电泳处理。座背板：加厚双层钢板封边，后背飞机翼钢板支撑。三脚架：冷轧钢三脚架，表面抛光，防锈电泳处理。防滑脚：加强型方管加防滑脚，高承重，静音防滑脚垫。');
+                            $('.input-upload:eq(11)').val('适用于医院候诊区、机场等候区、高铁候车室、公共休息室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='座包：优质PU材质厚20mm，内加高回弹棉，不变色，绿色无毒环保。框架：全封闭式横梁设计，1.5mm厚冷轧钢压铸，超强承重力，表面经抛光、静电喷涂，耐腐蚀、防生锈。扶手：防锈电泳处理。座背板：加厚双层钢板封边，后背飞机翼钢板支撑。三脚架：冷轧钢三脚架，表面抛光，防锈电泳处理。防滑脚：加强型方管加防滑脚，高承重，静音防滑脚垫。';
+					        $('.mc-small-title').next()[2].textContent='适用于医院候诊区、机场等候区、高铁候车室、公共休息室等等。';
+                            break;
+                            case "仿皮沙发":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('饰面材质：柔软韧性好的头层牛皮或耐磨性好的优质西皮；座包：内部填充高密度海绵；靠包：填充优质公仔棉；框架材质：镀锌五金脚架或优质实木框架。');
+                            $('.input-upload:eq(11)').val('适用于总裁办公室、总经理办公室、领导办公室、高管办公室、行政办公室、大堂前台区、会议室、接待室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='饰面材质：柔软韧性好的头层牛皮或耐磨性好的优质西皮；座包：内部填充高密度海绵；靠包：填充优质公仔棉；框架材质：镀锌五金脚架或优质实木框架。';
+					        $('.mc-small-title').next()[2].textContent='适用于总裁办公室、总经理办公室、领导办公室、高管办公室、行政办公室、大堂前台区、会议室、接待室等等。';
+                            break;
+                            case "布艺沙发":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('饰面材质：天然透气环保棉麻布或绒面布料；座包：内部填充高密度海绵；靠包：填充优质公仔棉；框架材质：镀锌五金脚架或优质实木框架。');
+                            $('.input-upload:eq(11)').val('适用于行政办公室、大堂前台区、公共休闲区、西餐厅、咖啡馆、门店洽谈区等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='饰面材质：天然透气环保棉麻布或绒面布料；座包：内部填充高密度海绵；靠包：填充优质公仔棉；框架材质：镀锌五金脚架或优质实木框架。';
+					        $('.mc-small-title').next()[2].textContent='适用于行政办公室、大堂前台区、公共休闲区、西餐厅、咖啡馆、门店洽谈区等等。';
+                            break;
+                            case "真皮沙发":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('饰面材质：柔软韧性好的头层牛皮或耐磨性好的优质西皮；座包：内部填充高密度海绵；靠包：填充优质公仔棉；框架材质：镀锌五金脚架或优质实木框架。');
+                            $('.input-upload:eq(11)').val('适用于总裁办公室、总经理办公室、领导办公室、高管办公室、行政办公室、大堂前台区、会议室、接待室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='饰面材质：柔软韧性好的头层牛皮或耐磨性好的优质西皮；座包：内部填充高密度海绵；靠包：填充优质公仔棉；框架材质：镀锌五金脚架或优质实木框架。';
+					        $('.mc-small-title').next()[2].textContent='适用于总裁办公室、总经理办公室、领导办公室、高管办公室、行政办公室、大堂前台区、会议室、接待室等等。';
+                            break;
+                            case "异性沙发":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('饰面材质：天然透气环保棉麻布、绒面布料、耐磨性好的优质西皮；座包：内部填充高密度海绵；靠包：填充优质公仔棉；框架材质：镀锌五金脚架或优质实木框架。');
+                            $('.input-upload:eq(11)').val('适用于大堂前台区、公共休闲区、商业文化休闲区、儿童游乐区等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='饰面材质：天然透气环保棉麻布、绒面布料、耐磨性好的优质西皮；座包：内部填充高密度海绵；靠包：填充优质公仔棉；框架材质：镀锌五金脚架或优质实木框架。';
+					        $('.mc-small-title').next()[2].textContent='适用于大堂前台区、公共休闲区、商业文化休闲区、儿童游乐区等等。';
+                            break;
+
+
+                            case "实木班台":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('面板材质：原木或实木贴皮；支架材质：不锈钢脚架或木质支架。');
+                            $('.input-upload:eq(11)').val('适用于总裁办公室、总经理办公室、老板办公室、领导办公室、高管办公室、行政办公室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='面板材质：原木或实木贴皮；支架材质：不锈钢脚架或木质支架。';
+					        $('.mc-small-title').next()[2].textContent='适用于总裁办公室、总经理办公室、老板办公室、领导办公室、高管办公室、行政办公室等等。';
+                            break;
+                            case "板式班台":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('面板材质：E1级板材、三聚氰胺板；支架材质：不锈钢脚架或木质支架。');
+                            $('.input-upload:eq(11)').val('适用于总裁办公室、总经理办公室、老板办公室、领导办公室、高管办公室、行政办公室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='面板材质：E1级板材、三聚氰胺板；支架材质：不锈钢脚架或木质支架。';
+					        $('.mc-small-title').next()[2].textContent='适用于总裁办公室、总经理办公室、老板办公室、领导办公室、高管办公室、行政办公室等等。';
+                            break;
+
+
+                            case "实木办公会议桌":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('面板材质：原木或实木贴皮；支架材质：不锈钢脚架或木质支架。');
+                            $('.input-upload:eq(11)').val('适用于会议室、洽谈室、接待室、培训室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='面板材质：原木或实木贴皮；支架材质：不锈钢脚架或木质支架。';
+					        $('.mc-small-title').next()[2].textContent='适用于会议室、洽谈室、接待室、培训室等等。';
+                            break;
+                            case "板式办公会议桌":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('面板材质：E1级板材、三聚氰胺板；支架材质：不锈钢脚架或木质支架。');
+                            $('.input-upload:eq(11)').val('适用于会议室、洽谈室、接待室、培训室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='面板材质：E1级板材、三聚氰胺板；支架材质：不锈钢脚架或木质支架。';
+					        $('.mc-small-title').next()[2].textContent='适用于会议室、洽谈室、接待室、培训室等等。';
+                            break;
+                            case "玻璃会议桌":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('面板材质：钢化玻璃；支架材质：不锈钢脚架或木质支架。');
+                            $('.input-upload:eq(11)').val('适用于会议室、洽谈室、接待室、培训室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='面板材质：钢化玻璃；支架材质：不锈钢脚架或木质支架。';
+					        $('.mc-small-title').next()[2].textContent='适用于会议室、洽谈室、接待室、培训室等等。';
+                            break;
+                            case "洽谈桌":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('面板材质：E1级板材、三聚氰胺板；支架材质：不锈钢脚架或木质支架。');
+                            $('.input-upload:eq(11)').val('适用于会议室、洽谈室、接待室、培训室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='面板材质：E1级板材、三聚氰胺板；支架材质：不锈钢脚架或木质支架。';
+					        $('.mc-small-title').next()[2].textContent='适用于会议室、洽谈室、接待室、培训室等等。';
+                            break;
+
+
+                            case "实木办公会议桌":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('面板材质：原木或实木贴皮；支架材质：不锈钢脚架或木质支架。');
+                            $('.input-upload:eq(11)').val('适用于会议室、洽谈室、接待室、培训室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='面板材质：原木或实木贴皮；支架材质：不锈钢脚架或木质支架。';
+					        $('.mc-small-title').next()[2].textContent='适用于会议室、洽谈室、接待室、培训室等等。';
+                            break;
+                            case "板式办公会议桌":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('面板材质：E1级板材、三聚氰胺板；支架材质：不锈钢脚架或木质支架。');
+                            $('.input-upload:eq(11)').val('适用于会议室、洽谈室、接待室、培训室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='面板材质：E1级板材、三聚氰胺板；支架材质：不锈钢脚架或木质支架。';
+					        $('.mc-small-title').next()[2].textContent='适用于会议室、洽谈室、接待室、培训室等等。';
+                            break;
+                            case "玻璃会议桌":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('面板材质：钢化玻璃；支架材质：不锈钢脚架或木质支架。');
+                            $('.input-upload:eq(11)').val('适用于会议室、洽谈室、接待室、培训室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='面板材质：钢化玻璃；支架材质：不锈钢脚架或木质支架。';
+					        $('.mc-small-title').next()[2].textContent='适用于会议室、洽谈室、接待室、培训室等等。';
+                            break;
+
+                            case "实木办公文件柜":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('柜体材质：原木或实木贴皮。配件材质：进口五金配件，自动回弹静音导轨。拉门：玻璃拉门（木质拉门或钢制拉门）。');
+                            $('.input-upload:eq(11)').val('适用于任何需要存储的办公场所，包括办公室、资料室、会议室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='柜体材质：原木或实木贴皮。配件材质：进口五金配件，自动回弹静音导轨。拉门：玻璃拉门（木质拉门或钢制拉门）。';
+					        $('.mc-small-title').next()[2].textContent='适用于任何需要存储的办公场所，包括办公室、资料室、会议室等等。';
+                            break;
+                            case "板式办公文件柜":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('柜体材质：E1级板材、三聚氰胺板。配件材质：进口五金配件，自动回弹静音导轨。拉门：玻璃拉门（木质拉门或钢制拉门）。');
+                            $('.input-upload:eq(11)').val('适用于任何需要存储的办公场所，包括办公室、资料室、会议室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='柜体材质：E1级板材、三聚氰胺板。配件材质：进口五金配件，自动回弹静音导轨。拉门：玻璃拉门（木质拉门或钢制拉门）。';
+					        $('.mc-small-title').next()[2].textContent='适用于任何需要存储的办公场所，包括办公室、资料室、会议室等等。';
+                            break;
+                            case "钢制办公文件柜":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('柜体材质：加厚冷轧钢板。配件材质：进口五金配件，自动回弹静音导轨。拉门：玻璃拉门（木质拉门或钢制拉门）。');
+                            $('.input-upload:eq(11)').val('适用于任何需要存储的办公场所，包括办公室、资料室、会议室等等。');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='柜体材质：加厚冷轧钢板。配件材质：进口五金配件，自动回弹静音导轨。拉门：玻璃拉门（木质拉门或钢制拉门）。';
+					        $('.mc-small-title').next()[2].textContent='适用于任何需要存储的办公场所，包括办公室、资料室、会议室等等。';
+                            break;
+
+                            case "屏风工作位":
+                            $('.input-upload:eq(9)').val('丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。');
+                            $('.input-upload:eq(10)').val('面板材质：E1级板材、三聚氰胺板；支架材质：不锈钢脚架或木质支架。挡板材质：玻璃挡板、木质挡板、布艺挡板等。');
+                            $('.input-upload:eq(11)').val('职员办公室、客服中心、研发中心');
+                            $('.mc-small-title').next()[0].textContent='丰富的色彩选择，包括白色、枫木色、柚木色、绿色、米色、咖色、黑色等多种时尚用色。' ; //yanse
+					        $('.mc-small-title').next()[1].textContent='面板材质：E1级板材、三聚氰胺板；支架材质：不锈钢脚架或木质支架。挡板材质：玻璃挡板、木质挡板、布艺挡板等。';
+					        $('.mc-small-title').next()[2].textContent='职员办公室、客服中心、研发中心';
+                            break;
+                    };
+
+                    var list_q=$('.prod-ques input.input-upload');
+                    for(var j = 0;j<list_q.length;j++){
+					list_q[j].previousSibling.innerHTML=list_q[j].previousSibling.innerHTML.replace('x',keyword_select);
+                    }
+/*
+				if(array.length=2){
+                    var str = '品源办公家具有限公司，上海'+array[0]+'定制品牌。'+array[0]+'页面主要提供'+array[0]+'、'+array[1]+'定制、价格、图片、尺寸。品源皮质会议椅高档办公椅，厂家直销，服务上门，全国配送。';
+                    description.attr('value',str);
+					    b[0].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					    b[1].previousSibling.setAttribute('alt', array[1]+'-品源'+keyword_select);
+					    b[2].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					    b[3].previousSibling.setAttribute('alt', array[1]+'-品源'+keyword_select);
+					    b[4].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					    b[5].previousSibling.setAttribute('alt', array[1]+'尺寸-品源'+keyword_select);
+					
+					}else if(array.length=3){
+                       
+                        //设置描述
+				        var str = '品源办公家具有限公司，上海'+array[0]+'定制品牌。'+array[0]+'页面主要提供'+array[0]+'、'+array[1]+'、'+array[2]+'定制、价格、图片、尺寸。品源皮质会议椅高档办公椅，厂家直销，服务上门，全国配送。';
+                        description.attr('value',str);
+                        
+                        b[0].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					    b[1].previousSibling.setAttribute('alt', array[1]+'-品源'+keyword_select);
+					    b[2].previousSibling.setAttribute('alt', array[2]+'-品源'+keyword_select);
+					    b[3].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					    b[4].previousSibling.setAttribute('alt', array[1]+'-品源'+keyword_select);
+					    b[5].previousSibling.setAttribute('alt', array[2]+'尺寸-品源'+keyword_select); 
+                      //  console.log($('.product-details__title .input-upload')) //.val(array[0]);
+                    
+                     // $('h2').html(array[0]+'简约现代的风格，以流畅的线条感营造出时尚、实用、简而美的艺术风格。注重流畅的线条设计，为生活化繁为简，摒弃芜杂，致力于简单舒适的办公空间。');
+
+					
+					
+					}
+                    */
+					
+					});
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					/*
+					
+					
+					
+					
+				
+				var str = '品源办公家具有限公司，上海'+array[0]+'定制品牌。'+array[0]+'页面主要提供'+array[0]+'、'+array[1]+'、'+array[2]+'定制、价格、图片、尺寸。品源皮质会议椅高档办公椅，厂家直销，服务上门，全国配送。';
+				keyword.attr('value',array.join(','));
+				
+				//b[0].attr('value','a');
+				//console.log(b[1].val(array[0]));
+				//b[0].attr('value','a');
+				//console.log(b[0].previousSibling.setAttribute('alt',array[0]));
+				
+				//b.val(array[0]);
+				//for(var i=0;i<b.length;i++){
+				//console.log(b[i].previousSibling)
+				
+				/*
+				for(var i =0;i<=b.length-1;i++){
+					
+					if(i=>3){
+					
+					if(i=5){
+					
+					b[i].previousSibling.setAttribute('alt', array[i-3]+'尺寸-品源'+keyword_select);
+					}else{
+					b[i].previousSibling.setAttribute('alt', array[i-3]+'-品源'+keyword_select);
+					}
+						
+						
+						
+
+					}else{
+						b[i].previousSibling.setAttribute('alt', array[i]+'-品源'+keyword_select);
+
+					}
+				}
+					
+					b[0].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					b[1].previousSibling.setAttribute('alt', array[1]+'-品源'+keyword_select);
+					b[2].previousSibling.setAttribute('alt', array[2]+'-品源'+keyword_select);
+					b[3].previousSibling.setAttribute('alt', array[0]+'-品源'+keyword_select);
+					b[4].previousSibling.setAttribute('alt', array[1]+'-品源'+keyword_select);
+					b[5].previousSibling.setAttribute('alt', array[2]+'尺寸-品源'+keyword_select);  
+					//$('.product-details__title .input-upload').val(array[0]+'简约现代的风格，以流畅的线条感营造出时尚、实用、简而美的艺术风格。注重流畅的线条设计，为生活化繁为简，摒弃芜杂，致力于简单舒适的办公空间。');
+					$('h2').html(array[0]+'简约现代的风格，以流畅的线条感营造出时尚、实用、简而美的艺术风格。注重流畅的线条设计，为生活化繁为简，摒弃芜杂，致力于简单舒适的办公空间。');
+					
+					$('.product-details__description').html(array[1]+'舒适软椅用料实在，严选品质PP材料，坚韧结实。材质环保健康，坚韧结实，色彩饱和，磨砂质地，一体成型注塑工艺。弧形镂空椅背，贴合背部，通透清爽。')
+					//$('.product-details__description').next().val(array[1]+'舒适软椅用料实在，严选品质PP材料，坚韧结实。材质环保健康，坚韧结实，色彩饱和，磨砂质地，一体成型注塑工艺。弧形镂空椅背，贴合背部，通透清爽。');
+					$('.bigimg-item .text')[0].textContent=keyword_select+'灵活多变，满足办公多用途，营造个性化办公空间，让工作活力出彩。人体工学椅背，椅背曲线契合人体脊椎的弯曲度，合理承托背部。椅面宽阔厚实，弧形贴合臀部，坐感舒适。';
+					$('.bigimg-item .text')[1].textContent=keyword_select+'舒适透气，镂空设计，透气贴合椅面，柔软舒适。全钢架支撑，加厚钢管，更结实更稳固，轻巧三角形，交叉脚设计，更稳固，冲压工程塑料，结实有弹性，具有耐冲击、抗老化、抗氧化等特点，承重强，弹性足，坐感柔软舒适。';
+
+					$('.mc-small-title').next()[0].textContent='丰富的色彩选择，随心配色，包括白色、黑色、棕色、绿色、米色、咖色、红色等多种时尚用色。' ; //yanse
+					$('.mc-small-title').next()[1].textContent='饰面：清爽透气的交织网布、亲肤柔软的棉麻布或耐磨性好的优质西皮；座包：海绵、弹簧、乳胶，任意选择，可满足经典、运动或柔软等的需求；框架：工程PP框架，用材环保、经久耐用；底盘：2MM安全防爆底盘，加厚钢板、稳固结实。气压杆：SGS认证气压杆，加厚管壁、安全耐用；承重脚：高承重椅脚，可以选择钢制脚、弓形脚、尼龙椅脚；滑轮：轻音低噪，升级PU轮，防滑耐磨。';
+					$('.mc-small-title').next()[2].textContent='适用于职员区、会议区、接待洽谈区、家庭、学生宿舍等等。';
+					
+					
+					
+					var list_q=$('.prod-ques input.input-upload');
+					
+				for(var j = 0;j<list_q.length;j++){
+					//console.log(list_q[j].previousSibling.innerHTML);
+					//console.log(list_q[j].previousSibling.innerHTML);
+                    var list_q=$('.prod-ques input.input-upload');
+						list_q[j].previousSibling.innerHTML=list_q[j].previousSibling.innerHTML.replace('x',keyword_select);
+				
+				//console.log(quest=quest.replace('x',a));
+				
+					//if(quest.indexOf('x')>0){
+					//console.log('a')
+						
+					//	this.quest=quest.replace('x',a);
+					
+						
+							
+					//}
+					//list_q[j].previousSibling.innerHTML.replace('x',a)
+					
+				}(j);
+			//	
+					
+					
+					//var keyword_text = $('.text').next();
+					//keyword_text[0].val('s');
+					//previousSibling.innerHTML
+					//var t1 = $('.text')[0];
+					//t1.html('asdf');
+
+
+			}
+			);
+			*/
+            <?php 
+            if(isset($_GET['id']))
+            {
+              echo '$(".layui-form").append("<div class=\'img-preview\'><i class=\'layui-icon layui-icon-circle-dot\' style=\'font-size: 30px; color: #1E9FFF;\'></i></div>"); 
+                    $.ajaxSettings.async = false;
+                    $.get("./api/get_product_detail.php?id='.$_GET['id'].'",function(res){
+                        var list = res.data;
+                        var value = list.siteid;
+                        id.val(list.aid);
+                        title.val(list.title);
+                        keyword.val(list.keyword);
+                        img_lit = list.imglit;
+                        description.val(list.description);
+                        site_select.val(value);
+                        $(".edit-wrapper").html(list.content);
+
+                        $.get("./api/get_site_data.php", function (data) {
+                            var car_arr = data["cat_pro"][value];
+                            $("#cat").html("<option value=\'\'></option>");
+                            for (var key in car_arr) {
+                                $("#cat").append(\'<option value="\' + key + \'">\' + car_arr[key] + \'</option>\');
+                            }
+                            cat_select.val(list.catid);
+                            form.render("select");
+                        });
+                    });
+                    $.ajaxSettings.async = true;';
+            }
+            ?>
+			
+            $.get('./api/get_code_templet.php', { siteid: 1001 }, function (data) {
+                var str = data.data.replace(/<lk-dom>/g, '');
+                str = str.replace(/<\/lk-dom>/g, '');
+                str = str.replace(/<span style="white-space:pre">([\s\S]*?)<\/span>/g, '');
+
+                <?php 
+                if(!isset($_GET['id']))
+                {
+                  echo '$(".edit-wrapper").append(str);';
+                }
+                ?>
+				
+			//	keyword.focusout(function () {
+			//	var list_q=$('.prod-ques input.input-upload');
+			//	var a= keyword.val();
+			//	var b= $('img.add-input').next();
+			//	b.val(a);
+			//	for(var i=0;i<b.length;i++){
+				//console.log(b[i].previousSibling)
+			//		b[i].previousSibling.setAttribute('alt', a);
+			//	}
+				//b.previousSibling.setAttribute('alt', a)
+				
+			//	for(var j = 0;j<list_q.length;j++){
+					//console.log(list_q[j].previousSibling.innerHTML);
+					//console.log(list_q[j].previousSibling.innerHTML);
+			//	 list_q[j].previousSibling.innerHTML=list_q[j].previousSibling.innerHTML.replace('x',a);
+				
+				//console.log(quest=quest.replace('x',a));
+				
+					//if(quest.indexOf('x')>0){
+					//console.log('a')
+						
+					//	this.quest=quest.replace('x',a);
+					
+						
+							
+					//}
+					//list_q[j].previousSibling.innerHTML.replace('x',a)
+					
+			//	}(j);
+			//	
+			//	});
+			//	//console.log();
+				
+				
+                $('.add-input').after('<input type="text" class="input-upload" oninput="Iwatch(this)">');
+                
+                $('img.add-input').before('<button type="button" class="layui-btn img-upload img-upload-2" lay-data="{url: \'http://www.pinyuan.cc/new_module/api/upload_img.php\', accept: \'images\'}">'
+                    + '<i class="layui-icon">&#xe67c;</i>上传图片</button>');
+
+
+                <?php 
+                if(isset($_GET['id']))
+                {
+                  echo '$(".add-input").each(function(){
+                            if($(this)[0].nodeName !== "IMG"){
+                                $(this).next().val($(this).text());
+                            }else{
+                                $(this).next().val($(this).attr("alt"));
+                            }
+                        });
+                        var tip_index;
+                        img_arr=[];
+                        $(".input-upload,.layui-input").hover(function(){
+                            var that = this;
+                            var value = $(this).val();
+                            tip_index = layer.tips(value, that, {tips: 1, time: 0, area: "auto", maxWidth: 350}); 
+                        },function(){
+                            layer.close(tip_index);
+                        });
+
+                        
+                        img_arr.push(img_lit);
+                        $("img.add-input").each(function(){
+                            img_arr.push($(this).attr("src"));
+                        });
+                        img_arr_len = img_arr.length;
+
+                        $(".img-preview").click(function(){
+                            layer.open({
+                                type: 1,
+                                title: false, //不显示标题栏
+                                closeBtn: true,
+                                area: ["95%","90%"],
+                                shade: 0.8,
+                                id: "LAY_layuipro", //设定一个id，防止重复弹出
+                                btnAlign: "c",
+                                moveType: 1, //拖拽模式，0或者1
+                                content: "<div class=\'layui-carousel\' id=\'preview\' lay-filter=\'preview\'>"
+                                            +"<div carousel-item=\'\'>"
+                                            +"</div>"
+                                         +"</div>"
+                                         +"<script>"
+                                                +"var ins = carousel.render({"
+                                                    +"elem: \'#preview\',"
+                                                    +"autoplay: false,"
+                                                    +"width: \'100%\',"
+                                                    +"height: \'100%\',"
+                                                    +"arrow: \'always\'"
+                                                +"});"
+                                                +"for(var i=0;i<img_arr_len;i++){"
+                                                    +"$(\'#preview>div\').append(\'<div class=\"img-prv\"><img src=\"http://image.pinyuan.cc\'+img_arr[i]+\'\"></div>\');"
+                                                +"}"
+                                                +"ins.reload({"
+                                                    +"elem: \'#preview\',"
+                                                    +"autoplay: false,"
+                                                    +"width: \'100%\',"
+                                                    +"height: \'100%\',"
+                                                    +"arrow: \'always\'"
+                                                +"});"
+                                          +"<\/script>",
+                                success: function(layero){
+                                    setTimeout(function(){
+                                        for(var i=0;i<$(".img-prv").length;i++){
+                                            $(".img-prv").eq(i).append(\'<span class="size">\'+$("#preview .img-prv").eq(i).children("img")[0].naturalWidth+\'*\'+$("#preview .img-prv").eq(i).children("img")[0].naturalHeight+\'</span>\');
+                                        }
+                                    },200);
+                                }
+                            });
+                        });';
+                        
+                }
+                ?>
+
+                //编辑
+                $('.edit-item').append('<a class="layui-btn layui-btn-sm layui-btn-danger delete">删除</a>');
+                $('.delete').click(function () {
+                    $(this).parent().remove();
+                });
+                $('.size-img input').eq(0).after('<a class="layui-btn layui-btn-sm layui-btn-normal add">新增尺寸图</a>');
+                $('.add').css({ 'display': 'block', 'width': '100px', 'margin-top': '5px' });
+                var i = 3;
+    
+                $('.add').click(function () {
+                    var size_dom = '<button type="button" class="layui-btn img-upload img-upload-'+i+'" lay-data="{url: \'http://www.pinyuan.cc/new_module/api/upload_img.php\', accept: \'images\'}">'
+                    + '<i class="layui-icon">&#xe67c;</i>上传图片</button>'
+                    + '<input class="layui-upload-file" type="file" accept="undefined" name="file">'
+                    + '<img src="" class="add-input"><input type="text" class="input-upload" oninput="Iwatch(this)" placeholder="输入图片alt">';
+                    $('.size-img').append(size_dom);
+                    window['uploadInst_'+'i'] = upload.render({
+                        elem: '.img-upload-' + i,
+                        data: {
+                            id: <?php echo $_SESSION['id']; ?>,
+                        type: 2
+                        },
+                        done: function (res, index, upload) {
+                            if (res.code === 215) {
+                                var item = this.item;
+                                item.html('成功！');
+                                item.next().next().attr('src', res.data);
+                            } else {
+                                layer.msg('上传失败', {
+                                    time: 20000, //20s后自动关闭
+                                    btn: ['确定'],
+                                    zIndex: layer.zIndex * 1000000,
+                                });
+                            }
+                        },
+                        error: function () {
+                            layer.msg('服务器连接失败', {
+                                time: 20000, //20s后自动关闭
+                                btn: ['确定'],
+                                zIndex: layer.zIndex * 1000000,
+                            });
+                        }
+                    });
+                    i++;
+                });
+                //图片上传
+                var upload = layui.upload;
+                var uploadInst_1 = upload.render({
+                    elem: '.img-upload-1',
+                    url: 'http://www.pinyuan.cc/new_module/api/upload_img.php',
+                    accept: 'images',
+                    data: {
+                        id: <?php echo $_SESSION['id']; ?>,
+                        type: 1
+                    },
+                    done: function (res) {
+                        if (res.code === 215) {
+                            img_lit = res.data;
+                            $('.img-upload-1').html('成功！');
+                        } else {
+                            layer.msg('上传失败', {
+                                time: 20000, //20s后自动关闭
+                                btn: ['确定'],
+                                zIndex: layer.zIndex * 1000000,
+                            });
+                        }
+                    },
+                    error: function () {
+                        layer.msg('服务器连接失败', {
+                            time: 20000, //20s后自动关闭
+                            btn: ['确定'],
+                            zIndex: layer.zIndex * 1000000,
+                        });
+                    }
+                });
+                var uploadInst_2 = upload.render({
+                    elem: '.img-upload-2',
+                    data: {
+                        id: <?php echo $_SESSION['id']; ?>,
+                    type: 2
+                    },
+                    done: function (res, index, upload) {
+                        if (res.code === 215) {
+                            var item = this.item;
+                            item.html('成功！');
+                            item.next().next().attr('src', res.data);
+                        } else {
+                            layer.msg('上传失败', {
+                                time: 20000, //20s后自动关闭
+                                btn: ['确定'],
+                                zIndex: layer.zIndex * 1000000,
+                            });
+                        }
+                    },
+                    error: function () {
+                        layer.msg('服务器连接失败', {
+                            time: 20000, //20s后自动关闭
+                            btn: ['确定'],
+                            zIndex: layer.zIndex * 1000000,
+                        });
+                    }
+                    });
+                });
+
+                form.on('select(site)', function (data) {
+                    var value = data.value;
+                    $.get('./api/get_site_data.php', function (data) {
+                        var source_arr = data['source'][value];
+                        var car_arr = data['cat_pro'][value];
+                        $('#cat').html('<option value=""></option>');
+                        for (var key in car_arr) {
+                            $('#cat').append('<option value="' + key + '">' + car_arr[key] + '</option>');
+                        }
+                        form.render('select');
+                    });
+                });
+				
+        });
+    </script>
+</body>
+
+</html>

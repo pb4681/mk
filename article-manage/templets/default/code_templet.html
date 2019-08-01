@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>麦开信息管理系统 - Code_Templet</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white extend">
+    <div class="form-wrapper">
+        <div class="layui-form-item layui-form-text">
+            <div class="layui-input-inline code-area">
+                <div contenteditable="true"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./extend/layui/layui.js"></script>
+    <script>
+        var code_area;
+        layui.use(['form', 'layer'], function () {
+            var $ = layui.$;
+            code_area = $('.code-area>div');
+        });
+    </script>
+</body>
+
+</html>

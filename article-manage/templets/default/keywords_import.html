@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>麦开信息管理系统 - Keywords_Import</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white extend">
+    <div class="form-wrapper">
+        <form class="layui-form">
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">关键词</label>
+                <div class="layui-input-inline">
+                    <div id="kw_content" contenteditable="true"></div>
+                </div>
+            </div>
+            <div class="layui-form-item" style="display: inline-block;">
+                <label class="layui-form-label">网站选择</label>
+                <div class="layui-input-inline my-text-input-250">
+                    <select name="site" lay-verify="required" lay-filter="site" id="site">
+                        <option value=""></option>
+                        <option value="1001">办公家具（www.pinyuan.cc）</option>
+                        <option value="1002">办公设备（www.pinyuan.cc）</option>
+                        <option value="1003">办公家具厂（www.china-pinyuan.com）</option>
+                        <option value="1004">儿童家具（children.pinyuan.cc）</option>
+                        <option value="1005">学校家具（school.pinyuan.cc）</option>
+                        <option value="1006">医院家具（hospital.pinyuan.cc）</option>
+                        <option value="1007">图书馆家具（library.pinyuan.cc）</option>
+                        <option value="1008">办公家具装修（office.pinyuan.cc）</option>
+                        <option value="1009">公寓家具（apartment.pinyuan.cc）</option>
+                        <option value="1010">餐厅家具（restaurant.pinyuan.cc）</option>
+                        <option value="1011">酒店家具（hotel.pinyuan.cc）</option>
+                        <option value="1012">零售家具（shelf.pinyuan.cc）</option>
+                        <option value="1013">智美综合（www.zmshoo.com）</option>
+                        <option value="1014">新风净化（cleaner.zmshoo.com）</option>
+                        <option value="1015">净水系统（water.zmshoo.com）</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    <script src="./templets/asset/js/vue.js"></script>
+    <script>
+        var keywrds_content, siteid;
+        //清除样式
+        function textFormat(e) {
+            e.preventDefault()
+            var text
+            var clp = (e.originalEvent || e).clipboardData
+            if (clp === undefined || clp === null) {
+                text = window.clipboardData.getData('text') || ''
+                if (text !== '') {
+                    if (window.getSelection) {
+                        var newNode = document.createElement('span')
+                        newNode.innerHTML = text
+                        window.getSelection().getRangeAt(0).insertNode(newNode)
+                    } else {
+                        document.selection.createRange().pasteHTML(text)
+                    }
+                }
+            } else {
+                text = clp.getData('text/plain') || ''
+                if (text !== '') {
+                    document.execCommand('insertText', false, text)
+                }
+            }
+        }
+        layui.use(['form', 'layer'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+            var $ = layui.$;
+
+            keywrds_content = $('#kw_content');
+            siteid = $('#site');
+            
+            keywrds_content.on('paste', function (e) {
+                textFormat(e)
+            });
+        });
+    </script>
+</body>
+
+</html>

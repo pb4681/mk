@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>麦开信息管理系统 - User_Manage</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white">
+    <div class="form-wrapper">
+        <div class="table-btn" id="add_user">
+            <a class="layui-btn">添加用户</a>
+        </div>
+        <div class="table-wrapper">
+            <table class="layui-table">
+                <colgroup>
+                    <col width="150">
+                    <col width="200">
+                    <col>
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>昵称</th>
+                        <th style="text-align: center;">头像</th>
+                        <th>权限</th>
+                        <th>最后登陆</th>
+                        <th>IP</th>
+                        <th style="text-align: center;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    foreach($arr as $v){
+                    echo 
+                    '<tr>
+                        <td class="id">'.$v['id'].'</td>
+                        <td class="username">'.$v['username'].'</td>
+                        <td class="nickname">'.$v['nickname'].'</td>
+                        <td style="width:50px;height:50px;"><img src="'.$v['imgurl'].'" style="width:100%;height:100%;"></td>
+                        <td class="authority">'.$v['authority'].'</td>
+                        <td>'.date("Y-m-d H:i:s",$v['lastlogin']).'</td>
+                        <td>'.$v['ip'].'</td>
+                        <td align="center">
+                            <a class="layui-btn layui-btn-warm layui-btn-xs manage">分配</a>
+                            <a class="layui-btn layui-btn-normal layui-btn-xs edit">编辑</a>
+                            <a class="layui-btn layui-btn-danger layui-btn-xs del">删除</a>
+                        </td>
+                    </tr>';
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    <script>
+        var par_id;
+        layui.use(['jquery', 'layer'], function () {
+            var $ = layui.$;
+            var layer = layui.layer;
+
+            function authority_func() {
+                $('.authority').each(function () {
+                    var n = $(this).text();
+                    switch (n) {
+                        case '1':
+                            $(this).text('管理员');
+                            break;
+                        case '2':
+                            $(this).text('文章发布');
+                            break;
+                        case '3':
+                            $(this).text('跟单记录');
+                            break;
+                    }
+                });
+                $('.manage').click(function () {
+                    var par_tr = $(this).parents('tr');
+                    var id = par_tr.find('.id').text();
+                    var loading = layer.load(0, {
+                        shade: false,
+                        time: 30 * 1000,
+                        zIndex: layer.zIndex * 1000000
+                    });
+                    $.post('./api/deliver_article.php',
+                        {
+                            id: id
+                        },
+                        function (data) {
+                            if (data.code === 212) {
+                                layer.msg('分配成功', {
+                                    time: 3000, //20s后自动关闭
+                                    zIndex: layer.zIndex * 1000000,
+                                });
+                                layer.close(loading);
+                            }
+                        });
+                });
+                $('.edit').click(function () {
+                    var par_tr = $(this).parents('tr');
+                    var id = par_tr.find('.id').text();
+                    var u_name = par_tr.find('.username');
+                    var n_name = par_tr.find('.nickname');
+                    var auth = par_tr.find('.authority');
+                    par_id = id;
+                    layer.open({
+                        type: 2,
+                        title: '用户编辑',
+                        area: ['50%', '351px'],
+                        shade: 0,
+                        maxmin: true,
+                        offset: 'auto',
+                        content: './user_edit.php',
+                        btn: ['确定', '取消', '获取头像'],
+                        shade: [0.4, '#393D49'],
+                        btn1: function (index, layero) {
+                            var username = layero.find("iframe")[0].contentWindow.username.val();
+                            var nickname = layero.find("iframe")[0].contentWindow.nickname.val();
+                            var password = layero.find("iframe")[0].contentWindow.password.val();
+                            var authority = layero.find("iframe")[0].contentWindow.authority.val();
+                            var auth_text = layero.find("iframe")[0].contentWindow.authority;
+                            if (!username || !nickname || !authority) {
+                                layer.msg('信息未填写完整', {
+                                    time: 2000000, //20s后自动关闭
+                                    btn: ['确定'],
+                                    zIndex: layer.zIndex * 1000000,
+                                });
+                                return false;
+                            }
+                            var loading = layer.load(0, {
+                                shade: false,
+                                time: 30 * 1000,
+                                zIndex: layer.zIndex * 1000000
+                            });
+                            $.post('./api/user_edit.php',
+                                {
+                                    id: id,
+                                    username: username,
+                                    nickname: nickname,
+                                    password: password,
+                                    authority: authority
+                                },
+                                function (data) {
+                                    if (data.code === 212) {
+                                        u_name.text(username),
+                                            n_name.text(nickname),
+                                            auth.text(auth_text.find('option:selected').text());
+                                        layer.closeAll();
+                                    }
+                                });
+                        },
+                        btn2: function () {
+                            layer.closeAll();
+                        },
+                        btn3: function() {
+                            $.get('./api/get_wx_img.php?id='+par_id,function(data){
+                                if(data.code === 230){
+                                    layer.msg('微信头像获取成功', {
+                                        time: 3000, 
+                                        zIndex: layer.zIndex * 1000000,
+                                    });
+                                }
+                            });
+                            return false;
+                        },
+                        zIndex: layer.zIndex,
+                        success: function () {   //弹出后执行
+
+                        }
+                    });
+                });
+                $('.del').click(function () {
+                    var par_tr = $(this).parents('tr');
+                    var id = par_tr.find('.id').text();
+
+                    layer.confirm('确定要删除？？', function (index) {
+                        var loading = layer.load(0, {
+                            shade: false,
+                            time: 30 * 1000,
+                            zIndex: layer.zIndex * 1000000
+                        });
+                        $.post('./api/user_delete.php',
+                            {
+                                id: id
+                            },
+                            function (data) {
+                                if (data.code === 210) {
+                                    par_tr.remove();
+                                    layer.closeAll();
+                                }
+                            }
+                        );
+                    });
+                });
+            }
+            authority_func();
+            $('#add_user').click(function () {
+                layer.open({
+                    type: 2,
+                    title: '新增用户',
+                    area: ['50%', '351px'],
+                    shade: 0,
+                    maxmin: true,
+                    offset: 'auto',
+                    content: './user_add.php',
+                    btn: ['确定', '取消'],
+                    shade: [0.4, '#393D49'],
+                    btn1: function (index, layero) {
+                        var username = layero.find("iframe")[0].contentWindow.username.val();
+                        var nickname = layero.find("iframe")[0].contentWindow.nickname.val();
+                        var password = layero.find("iframe")[0].contentWindow.password.val();
+                        var authority = layero.find("iframe")[0].contentWindow.authority.val();
+                        if (!username || !nickname || !password || !authority) {
+                            layer.msg('信息未填写完整', {
+                                time: 2000000, //20s后自动关闭
+                                btn: ['确定'],
+                                zIndex: layer.zIndex * 1000000,
+                            });
+                            return false;
+                        }
+                        var loading = layer.load(0, {
+                            shade: false,
+                            time: 30 * 1000,
+                            zIndex: layer.zIndex * 1000000
+                        });
+                        $.get('./api/user_add.php',
+                            {
+                                username: username,
+                                nickname: nickname,
+                                password: password,
+                                authority: authority
+                            },
+                            function (data) {
+                                if (data.code === 209) {
+                                    var list = data.data;
+                                    $('.layui-table tbody').append('<tr><td class="id">' +
+                                        list['id'] + '</td><td>' +
+                                        list['username'] + '</td><td>' +
+                                        list['nickname'] + '</td><td></td><td class="authority">' +
+                                        list['authority'] + '</td><td></td><td></td><td align="center">' +
+                                        '<a class="layui-btn layui-btn-warm layui-btn-xs manage">分配</a>' +
+                                        '<a class="layui-btn layui-btn-normal layui-btn-xs edit">编辑</a> ' +
+                                        '<a class="layui-btn layui-btn-danger layui-btn-xs del">删除</a></td></tr>');
+                                    authority_func();
+                                    layer.closeAll();
+                                }
+                            });
+                    },
+                    btn2: function () {
+                        layer.closeAll();
+                    },
+                    zIndex: layer.zIndex,
+                    success: function () {   //弹出后执行
+
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>麦开信息管理系统 - Display</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white">
+    <div class="form-wrapper">
+        <form class="layui-form">
+            <div class="layui-form-item my-form-item">
+                <label class="layui-form-label my-label">日期</label>
+                <div class="layui-input-block my-select" style="margin-left: 80px;width: 150px;">
+                    <input type="text" class="layui-input" id="daterange">
+                </div>
+            </div>
+            <div class="layui-form-item my-form-item isupload-form-item">
+                <label class="layui-form-label my-label">询盘状态</label>
+                <div class="layui-input-block my-select">
+                    <select name="inquiry" lay-verify="required" lay-filter="inquiry" id="inquiry">
+                        <option value=""></option>
+                        <option value="未处理">未处理</option>
+                        <option value="已联系">已联系</option>
+                        <option value="无法联系">无法联系</option>
+                        <option value="跟进中">跟进中</option>
+                        <option value="已解决">已解决</option>
+                        <option value="未达成">未达成</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="table">
+        <table id="article_list" lay-filter="table"></table>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    <script type="text/html" id="tabletop">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+            <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+        </div>
+    </script>
+    <script type="text/html" id="status">
+        {{#  if(d.status === '未处理'){ }}
+            <button class="layui-btn layui-btn-primary layui-btn-xs">未处理</button>
+        {{#  } else if(d.status === '已联系') { }}
+            <button class="layui-btn layui-btn-xs layui-bg-cyan">已联系</button>
+        {{#  } else if(d.status === '无法联系') { }}
+            <button class="layui-btn layui-btn-xs layui-btn-danger">无法联系</button>
+        {{#  } else if(d.status === '跟进中') { }}
+            <button class="layui-btn layui-btn-xs layui-btn-warm">跟进中</button>
+        {{#  } else if(d.status === '已解决') { }}
+            <button class="layui-btn layui-btn-xs layui-btn-normal">已解决</button>
+        {{#  } else if(d.status === '未达成') { }}
+            <button class="layui-btn layui-btn-xs layui-btn-disabled">未达成</button>
+        {{#  } else if(d.status === '其他') { }}
+            <button class="layui-btn layui-btn-xs">其他</button>
+        {{#  } }}  
+    </script>
+    <script type="text/html" id="bar">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+    <script>
+        layui.use(['form', 'table', 'layer', 'laydate'], function () {
+            var form = layui.form;
+            var table = layui.table;
+            var layer = layui.layer;
+            var $ = layui.$;
+            var laydate = layui.laydate;
+
+            laydate.render({
+                elem: '#daterange', //指定元素
+                type: 'month',
+                range: true, //或 range: '~' 来自定义分割字符
+                done: function(value, date, endDate){
+                    table.reload('article_list', {
+                        url: './api/get_ask_page_list.php',
+                        where: {
+                            'daterange': value,
+                            'inquiry': $('#inquiry').val()
+                        }, //设定异步数据接口的额外参数
+                        page: {
+                            curr: 1 //重新从第 1 页开始
+                        }
+                    });
+                }
+            });
+            table.render({
+                elem: '#article_list',
+                toolbar: '#tabletop',
+                height: 530,
+                loading: true, //翻页加loading
+                url: './api/get_ask_page_list.php', //数据接口
+                where: {
+                    'daterange': '',
+                    'inquiry': ''
+                }, //设定异步数据接口的额外参数
+                page: true, //开启分页
+                cols: [[ //表头
+                    { type: 'checkbox', width: '3%' },
+                    { field: 'id', title: '编号', width: '4.8%' },
+                    { field: 'date', title: '日期', width: '4.8%' },
+                    { field: 'time', title: '时刻', width: '4.8%' },
+                    { field: 'name', title: '姓名', width: '4.8%' },
+                    { field: 'phone', title: '电话', width: '4.8%' },
+                    { field: 'qq', title: 'QQ', width: '4.8%' },
+                    { field: 'needs', title: '需求', width: '5%' },
+                    { field: 'source', title: '渠道来源', width: '7%' },
+                    { field: 'searchwords', title: '搜索词', width: '7%' },
+                    { field: 'area', title: '地域', width: '4%' },
+                    { field: 'openpage', title: '初始页面', width: '7%' },
+                    { field: 'path', title: '访问路径', width: '7%' },
+                    { field: 'useragent', title: '设备', width: '5%' },
+                    { field: 'chatway', title: '沟通方式', width: '7%' },
+                    { field: 'person', title: '跟进人', width: '5%' },
+                    { title: '状态', width: '5%', align: 'center', toolbar: '#status' },
+                    { title: '操作', width: '10%', align: 'center', toolbar: '#bar' }
+                ]]
+            });
+            form.on('select(inquiry)', function (data) {
+                table.reload('article_list', {
+                    url: './api/get_ask_page_list.php',
+                    where: {
+                        'daterange': $('#daterange').val(),
+                        'inquiry': data.value
+                    }, //设定异步数据接口的额外参数
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+            });
+            //监听工具条
+            table.on('tool(table)', function (obj) {
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                var tr = obj.tr; //获得当前行 tr 的DOM对象
+                var id = data.id;
+
+                if (layEvent === 'edit') { //编辑
+                    layer.open({
+                        type: 2,
+                        title: '询盘编辑',
+                        area: ['80%', '80%'],
+                        shade: 0,
+                        maxmin: true,
+                        offset: 'auto',
+                        content: './ask_edit.php?id='+id,
+                        btn: ['保存', '删除', '取消'],
+                        shade: [0.4, '#393D49'],
+                        btn1: function (index, layero) {
+                            var son = layero.find("iframe")[0].contentWindow
+                            ,date = son.date.val()
+                            ,time = son.time.val()
+                            ,username = son.username.val()
+                            ,phone = son.phone.val()
+                            ,qq = son.qq.val()
+                            ,needs = son.needs.val()
+                            ,source = son.source.val()
+                            ,searchwords = son.searchwords.val()
+                            ,area = son.area.val()
+                            ,openpage = son.openpage.val()
+                            ,path = son.path.val()
+                            ,useragent = son.useragent.val()
+                            ,chatway = son.chatway.val()
+                            
+                            var loading = layer.load(0, {
+                                shade: false,
+                                time: 30 * 1000,
+                                zIndex: layer.zIndex * 1000000
+                            });
+                            $.ajax({
+                                url: './api/ask_save.php',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    type: 'edit',
+                                    id:id,
+                                    date: date,
+                                    time: time,
+                                    name: username,
+                                    phone: phone,
+                                    qq: qq,
+                                    needs: needs,
+                                    source: source,
+                                    searchwords: searchwords,
+                                    area: area,
+                                    openpage: openpage,
+                                    path: path,
+                                    useragent: useragent,
+                                    chatway: chatway
+                                },
+                                success: function (data) {
+                                    layer.close(loading);
+                                    
+                                    if (data.code !== 224) {
+                                        layer.msg('保存出错', {
+                                            time: 2000000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                        return;
+                                    }
+                                    // 同步更新缓存对应的值
+                                    table.reload('article_list', {
+                                        url: './api/get_ask_page_list.php',
+                                        where: {
+                                            'daterange': $('#daterange').val(),
+                                            'inquiry': $('#inquiry').val()
+                                        } //设定异步数据接口的额外参数
+                                    });
+                                    layer.closeAll();
+                                },
+                                error: function () {
+                                    layer.msg('服务器连接失败', {
+                                        time: 20000, //20s后自动关闭
+                                        btn: ['确定'],
+                                        zIndex: layer.zIndex * 1000000,
+                                    });
+                                }
+                            });
+                        },
+                        btn2: function () {
+                            layer.confirm('确定要删除？？', function (index) {
+                                $.get('./api/ask_delete.php?id=' + id, function (data) {
+                                    // 同步更新缓存对应的值
+                                    table.reload('article_list', {
+                                        url: './api/get_ask_page_list.php',
+                                        where: {
+                                            'daterange': $('#daterange').val(),
+                                            'inquiry': $('#inquiry').val()
+                                        } //设定异步数据接口的额外参数
+                                    });
+                                    if (data.code !== 225) {
+                                        layer.msg('删除出错', {
+                                            time: 2000000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                        return false;
+                                    }
+                                });
+                                layer.closeAll();
+                            });
+                            return false;
+                        },
+                        btn3: function () {
+                            layer.closeAll();
+                        },
+                        zIndex: layer.zIndex,
+                        success: function () {   //弹出后执行
+
+                        }
+                    });
+                } else { //删除
+                    layer.confirm('确定要删除？？', function (index) {
+                        obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                        layer.close(index);
+                        $.get('./api/ask_delete.php', { id: obj.data.id });
+                    });
+                }
+            });
+            //监听头部按钮
+            table.on('toolbar(table)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                switch (obj.event) {
+                    case 'add':
+                        layer.open({
+                            type: 2,
+                            title: '询盘添加',
+                            area: ['80%', '80%'],
+                            shade: 0,
+                            maxmin: true,
+                            offset: 'auto',
+                            content: './ask_edit.php',
+                            btn: ['保存', '删除', '取消'],
+                            shade: [0.4, '#393D49'],
+                            btn1: function (index, layero) {
+                                var son = layero.find("iframe")[0].contentWindow
+                                ,date = son.date.val()
+                                ,time = son.time.val()
+                                ,username = son.username.val()
+                                ,phone = son.phone.val()
+                                ,qq = son.qq.val()
+                                ,needs = son.needs.val()
+                                ,source = son.source.val()
+                                ,searchwords = son.searchwords.val()
+                                ,area = son.area.val()
+                                ,openpage = son.openpage.val()
+                                ,path = son.path.val()
+                                ,useragent = son.useragent.val()
+                                ,chatway = son.chatway.val()
+                                
+                                var loading = layer.load(0, {
+                                    shade: false,
+                                    time: 30 * 1000,
+                                    zIndex: layer.zIndex * 1000000
+                                });
+                                $.ajax({
+                                    url: './api/ask_save.php',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        type: 'add',
+                                        date: date,
+                                        time: time,
+                                        name: username,
+                                        phone: phone,
+                                        qq: qq,
+                                        needs: needs,
+                                        source: source,
+                                        searchwords: searchwords,
+                                        area: area,
+                                        openpage: openpage,
+                                        path: path,
+                                        useragent: useragent,
+                                        chatway: chatway
+                                    },
+                                    success: function (data) {
+                                        layer.close(loading);
+                                        if (data.code !== 224) {
+                                            layer.msg('保存出错', {
+                                                time: 2000000, //20s后自动关闭
+                                                btn: ['确定'],
+                                                zIndex: layer.zIndex * 1000000,
+                                            });
+                                            return;
+                                        }
+                                        // 同步更新缓存对应的值
+                                        table.reload('article_list', {
+                                            url: './api/get_ask_page_list.php',
+                                            where: {
+                                                'daterange': $('#daterange').val(),
+                                                'inquiry': $('#inquiry').val()
+                                            } //设定异步数据接口的额外参数
+                                        });
+                                        layer.closeAll();
+                                    },
+                                    error: function () {
+                                        layer.msg('服务器连接失败', {
+                                            time: 20000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                    }
+                                });
+                            },
+                            btn2: function () {
+                                layer.confirm('确定要删除？？', function (index) {
+                                    $.get('./api/ask_delete.php?id=' + id, function (data) {
+                                        // 同步更新缓存对应的值
+                                        table.reload('article_list', {
+                                            url: './api/get_ask_page_list.php',
+                                            where: {
+                                                'daterange': $('#daterange').val(),
+                                                'inquiry': $('#inquiry').val()
+                                            } //设定异步数据接口的额外参数
+                                        });
+                                        if (data.code !== 225) {
+                                            layer.msg('删除出错', {
+                                                time: 2000000, //20s后自动关闭
+                                                btn: ['确定'],
+                                                zIndex: layer.zIndex * 1000000,
+                                            });
+                                            return false;
+                                        }
+                                    });
+                                    layer.closeAll();
+                                });
+                                return false;
+                            },
+                            btn3: function () {
+                                layer.closeAll();
+                            },
+                            zIndex: layer.zIndex,
+                            success: function () {   //弹出后执行
+
+                            }
+                        });
+                    break;
+                    case 'delete':
+                        if (!checkStatus.data.length) {
+                            layer.msg('请选择要删除的询盘', {
+                                time: 20000, //20s后自动关闭
+                                btn: ['确定']
+                            });
+                        } else {
+                            layer.confirm('确定要删除？？', function (index) {
+                                var art_list = [];
+                                var art_data = checkStatus.data;
+                                for (var j in checkStatus.data) {
+                                    art_list.push(art_data[j].id);
+                                }
+                                var art_str = art_list.join(',');
+                                layer.close(index);
+                                $.get('./api/ask_delete.php', { id: art_str }, function () {
+                                    table.reload('article_list', {
+                                        url: './api/get_ask_page_list.php',
+                                        where: {
+                                            'daterange': $('#daterange').val(),
+                                            'inquiry': $('#inquiry').val()
+                                        } //设定异步数据接口的额外参数
+                                    });
+                                });
+                            });
+                        }
+                    break;
+                };
+            });
+        });
+    </script>
+</body>
+
+</html>

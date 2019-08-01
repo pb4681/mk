@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>麦开信息管理系统 - Article_Edit</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white extend templet">
+    <div class="form-wrapper">
+        <form class="layui-form">
+            <div id="templet"></div>
+            <div class="layui-form-item layui-hide">
+                <div class="layui-input-inline">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    <script id="templet_tpl" type="text/html">
+        {{#  layui.each(d.list, function(index, item){ }}
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">{{ item.title }}({{ item.site }})</label>
+            <div class="layui-input-inline">
+                <div class="templet-item" contenteditable="true" siteid="{{ item.siteid }}"></div>
+            </div>
+        </div>
+        {{#  }); }}
+    </script>
+    <script>
+        var templet_json = {};
+        var templet_item;
+        layui.use(['form', 'laytpl', 'layer'], function () {
+            var form = layui.form;
+            var laytpl = layui.laytpl;
+            var layer = layui.layer;
+            var $ = layui.$;
+            var data = { //数据
+                'list': [
+                    { 'title': '办公家具', 'site': 'www.pinyuan.cc', 'siteid': '1001' },
+                    { 'title': '办公设备', 'site': 'www.pinyuan.cc', 'siteid': '1002' },
+                    { 'title': '办公家具厂', 'site': 'www.china-pinyuan.com', 'siteid': '1003' },
+                    { 'title': '儿童家具', 'site': 'children.pinyuan.cc', 'siteid': '1004' },
+                    { 'title': '学校家具', 'site': 'school.pinyuan.cc', 'siteid': '1005' },
+                    { 'title': '医院家具', 'site': 'hospital.pinyuan.cc', 'siteid': '1006' },
+                    { 'title': '图书馆家具', 'site': 'library.pinyuan.cc', 'siteid': '1007' },
+                    { 'title': '高端办公家具', 'site': 'office.pinyuan.cc', 'siteid': '1008' },
+                    { 'title': '公寓家具', 'site': 'apartment.pinyuan.cc', 'siteid': '1009' },
+                    { 'title': '餐厅家具', 'site': 'restaurant.pinyuan.cc', 'siteid': '1010' },
+                    { 'title': '酒店家具', 'site': 'hotel.pinyuan.cc', 'siteid': '1011' },
+                    { 'title': '零售家具', 'site': 'shelf.pinyuan.cc', 'siteid': '1012' },
+                    { 'title': '智美综合', 'site': 'www.zmshoo.com', 'siteid': '1013' },
+                    { 'title': '新风净化', 'site': 'cleaner.zmshoo.com', 'siteid': '1014' },
+                    { 'title': '净水系统', 'site': 'water.zmshoo.com', 'siteid': '1015' }
+                ]
+            }
+            var getTpl = templet_tpl.innerHTML;
+            var templet = document.getElementById('templet');
+            laytpl(getTpl).render(data, function (html) {
+                templet.innerHTML = html;
+            });
+
+            $(function () {
+                templet_item = $('.templet-item');
+                $.get('./api/templet_get.php', function (data) {
+                    templet_data = data.data;
+                    $('.templet-item').each(function () {
+                        var site_id = $(this).attr('siteid');
+                        for (var i in templet_data) {
+                            if (templet_data[i].siteid === site_id) {
+                                $(this).html(templet_data[i].templet);
+                            }
+                        }
+                    });
+                });
+                $('.layui-input-inline div').on('mouseup', function () {
+                    var this_div = $(this);
+                    var site_id = this_div.attr('siteid');
+                    var selection = $.trim(window.getSelection().toString());
+                    if (!selection) {
+                        return;
+                    }
+                    layer.prompt({
+                        formType: 0,
+                        title: '输入超链接',
+                    }, function (value, index, elem) {
+                        var a = this_div.html().replace(/&nbsp;/g, '').replace(/div/g, 'p');
+                        var b = a.replace(selection, '<a href="' + value + '">' + selection + '</a>');
+                        this_div.html(b);
+                        templet_json[site_id] = b;
+                        layer.close(index);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

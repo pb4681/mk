@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>麦开信息管理系统 - Article_Edit</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white extend">
+    <div class="form-wrapper">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">标题</label>
+                <div class="layui-input-inline my-text-input">
+                    <input type="text" name="title" required lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input"
+                        id="title">
+                </div>
+                <a href="javascript:;" class="layui-btn layui-btn-normal" id="title_single">自动</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal" id="title_select">选择</a>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">关键词</label>
+                <div class="layui-input-inline my-text-input">
+                    <input type="text" name="keyword" required lay-verify="required" placeholder="请输入关键词" autocomplete="off" class="layui-input"
+                        id="keyword">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">摘要</label>
+                <div class="layui-input-inline my-text-input-digest">
+                    <input type="text" name="digest" required lay-verify="required" placeholder="请输入摘要" autocomplete="off" class="layui-input"
+                        id="digest">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">文章内容</label>
+                <div class="layui-input-inline">
+                    <div id="content" contenteditable="true"></div>
+                </div>
+            </div>
+            <div class="layui-form-item" style="display: inline-block;">
+                <label class="layui-form-label">分类选择</label>
+                <div class="layui-input-inline my-text-input-250">
+                    <select name="cat" lay-verify="required" lay-filter="cat" id="cat">
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item my-check">
+                <label class="layui-form-label">添加结尾</label>
+                <div class="layui-input-inline">
+                    <input type="checkbox" name="switch" lay-skin="switch" lay-text="是|否" checked>
+                </div>
+            </div>
+            <div class="layui-form-item layui-hide">
+                <div class="layui-input-inline">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    <script>
+        document.oncontextmenu = function () {  //关闭右击默认事件
+            return false;
+        }
+        var title_val, keyword_val, digest_val, content_val, site_select, cat, is_add, writer, source, kw_id;
+        layui.use(['form', 'layer'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+            var $ = layui.$;
+
+            var parent_json = JSON.parse(parent.json);
+            var value = parent_json.site;
+
+            $.get('./api/get_site_data.php', function (data) {
+                writer = data['writer'][value];
+                source = data['source'][value];
+                var car_arr = data['cat'][value];
+                $('#cat').html('<option value=""></option>');
+                for (var key in car_arr) {
+                    $('#cat').append('<option value="' + key + '">' + car_arr[key] + '</option>');
+                }
+                form.render('select');
+            });
+
+            $(function () {
+                var id = parent_json.id;
+                var title = parent_json.title;
+                title_val = $('#title');
+                keyword_val = $('#keyword')
+                digest_val = $('#digest');
+                content_val = $('#content');
+                site_select = $('#industry');
+                cat_select = $('#cat');
+                is_add = $('.my-check em');
+                $('#title').val(title);
+                $.ajax({
+                    url: './api/get_article_detail.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        var data = data.data;
+                        $('#keyword').val(data.keyword);
+                        $('#digest').val(data.digest);
+                        $('#content').html(data.content);
+                        $('#content p').mousedown(function (e) {
+                            if (e.which === 3) {
+                                var _this = $(this);
+                                $('#content p').removeClass('blue');
+                                _this.addClass('blue');
+                                layer.confirm('确定删除吗', {
+                                    btn: ['确定', '取消']
+                                }, function () {
+                                    _this.remove();
+                                    layer.close(layer.index);
+                                }, function () {
+
+                                });
+                            }
+                        });
+                        $('#content p').dblclick(function () {
+                            $('.my-text-input-digest input').val($(this).text());
+                        });
+                    },
+                    error: function () {
+                        layer.msg('服务器连接失败', {
+                            time: 20000, //20s后自动关闭
+                            btn: ['确定']
+                        });
+                    }
+                });
+            });
+            $('#title_select').click(function () {
+                var siteid = value;
+                if(!siteid){
+                    layer.msg('请先选择网站', {
+                        time: 20000, //20s后自动关闭
+                        btn: ['确定']
+                    });
+                    return;
+                }
+                $.get('./api/get_keyword.php',{id: <?php echo $_SESSION['id']; ?>,siteid: value},function(res){
+                    if(!res.data.length){
+                        layer.msg('请先索取关键词', {
+                            time: 20000, //20s后自动关闭
+                            btn: ['确定']
+                        });
+                        return;
+                    }
+                    if(res.code === 221){
+                        var str_html = '';
+                        var list = res.data;
+                        for(var i=0;i<list.length;i++){
+                            str_html += '<p data-id="'+list[i].id+'">'+list[i].keyword+'</p>';
+                        }
+                        var _index = layer.prompt({
+                            formType: 2,
+                            maxlength: 10000,
+                            value: str_html,
+                            title: '标题选择',
+                            area: ['400px', '250px'] //自定义文本域宽高
+                        }, function (value, index, elem) {
+                            $('#edit_erea p').each(function () {
+                                if ($(this).attr('class') === 'bg-blue') {
+                                    $('#title').val($(this).text());
+                                    kw_id = $(this).data('id');   //获取关键词id
+                                }
+                            });
+                            layer.close(index);
+                        });
+                        $('.layui-layer-prompt textarea').css('display', 'none');
+                        $('.layui-layer-prompt .layui-layer-content').append('<div id="edit_erea" contenteditable="true"'
+                            +'style="width:400px;height:250px;border:1px solid #e6e6e6;color:#333">'
+                            + str_html +'</div>');
+                        $('#edit_erea p').click(function () {
+                            $('#edit_erea p').removeClass('bg-blue');
+                            $(this).addClass('bg-blue');
+                        });
+                        $('#edit_erea p').dblclick(function(){
+                            $('#edit_erea p').removeClass('bg-blue');
+                            $(this).addClass('bg-blue');
+                            $('#title').val($(this).text());
+                            kw_id = $(this).data('id');   //获取关键词id
+                            layer.close(_index);
+                        });
+                    }
+                });
+            });
+            $('#title_single').click(function(){
+                var siteid = value;
+                if(!siteid){
+                    layer.msg('请先选择网站', {
+                        time: 20000, //20s后自动关闭
+                        btn: ['确定']
+                    });
+                    return;
+                }
+                $.get('./api/get_keyword_single.php',{id: <?php echo $_SESSION['id']; ?>,siteid: value},function(res){
+                    if(res.data.id === null){
+                        layer.msg('请先索取关键词', {
+                            time: 20000, //20s后自动关闭
+                            btn: ['确定']
+                        });
+                        return;
+                    }
+                    if(res.code === 223){
+                        var data = res.data;
+                        $('#title').val(data.keyword);
+                        kw_id = data.id;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

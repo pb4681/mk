@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>麦开信息管理系统 - Ask_Edit</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white extend">
+    <div class="form-wrapper">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">日期</label>
+                <div class="layui-input-inline my-text-input">
+                    <input type="text" class="layui-input" id="date" value="<?php echo $row['writedate']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">时刻</label>
+                <div class="layui-input-inline my-text-input">
+                    <input type="text" class="layui-input" id="time" value="<?php echo $row['writetime']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">姓名</label>
+                <div class="layui-input-inline my-text-input">
+                    <input type="text" class="layui-input" id="username" value="<?php echo $row['name']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">电话</label>
+                <div class="layui-input-inline my-text-input">
+                    <input type="text" class="layui-input" id="phone" value="<?php echo $row['phone']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">QQ</label>
+                <div class="layui-input-inline my-text-input">
+                    <input type="text" class="layui-input" id="qq" value="<?php echo $row['qq']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">需求</label>
+                <div class="layui-input-inline my-text-input-600">
+                    <input type="text" class="layui-input" id="needs" value="<?php echo $row['needs']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item" style="display: inline-block;">
+                <label class="layui-form-label">渠道来源</label>
+                <div class="layui-input-inline my-text-input-250">
+                    <select name="source" lay-verify="required" lay-filter="source" id="source">
+                        <option value=""></option>
+                        <option value="直接访问">直接访问</option>
+                        <option value="百度自然搜索">百度自然搜索</option>
+                        <option value="360搜索">360搜索</option>
+                        <option value="搜狗">搜狗</option>
+                        <option value="神马搜索">神马搜索</option>
+                        <option value="谷歌">谷歌</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">搜索词</label>
+                <div class="layui-input-inline my-text-input">
+                    <input type="text" class="layui-input" id="searchwords" value="<?php echo $row['searchwords']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">地域</label>
+                <div class="layui-input-inline my-text-input">
+                    <input type="text" class="layui-input" id="area" value="<?php echo $row['area']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">初始页面</label>
+                <div class="layui-input-inline my-text-input">
+                    <input type="text" class="layui-input" id="openpage" value="<?php echo $row['openpage']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">访问路径</label>
+                <div class="layui-input-inline my-text-input-600">
+                    <input type="text" class="layui-input" id="path" value="<?php echo $row['path']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item" style="display: inline-block;">
+                <label class="layui-form-label">设备</label>
+                <div class="layui-input-inline my-text-input-250">
+                    <select name="useragent" lay-verify="required" lay-filter="useragent" id="useragent">
+                        <option value=""></option>
+                        <option value="PC">PC</option>
+                        <option value="移动">移动</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">沟通方式</label>
+                <div class="layui-input-inline my-text-input">
+                    <input type="text" class="layui-input" id="chatway" value="<?php echo $row['chatway']; ?>">
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    <script>
+        var date, time, name, phone, qq, needs, source, searchwords, area, openpage, path, useragent, chatway;
+        layui.use(['form', 'layer', 'laydate'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+            var $ = layui.$;
+            var laydate = layui.laydate;
+
+            laydate.render({
+                elem: '#date' //指定元素
+            });
+            laydate.render({
+                elem: '#time', //指定元素
+                type: 'time'
+            });
+
+            date = $('#date');
+            time = $('#time');
+            username = $('#username');
+            phone = $('#phone');
+            qq = $('#qq');
+            needs = $('#needs');
+            source = $('#source');
+            searchwords = $('#searchwords');
+            area = $('#area');
+            openpage = $('#openpage');
+            path = $('#path');
+            useragent = $('#useragent');
+            chatway = $('#chatway');
+
+            source.val('<?php echo $row['source']; ?>');
+            useragent.val('<?php echo $row['useragent']; ?>');
+            form.render('select');
+        });
+    </script>
+</body>
+
+</html>

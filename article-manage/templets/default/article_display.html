@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>麦开信息管理系统 - Article_Display</title>
+    <link rel="stylesheet" href="./extend/layui/css/layui.css">
+    <link rel="stylesheet" href="./templets/asset/css/main.css">
+</head>
+
+<body class="child-white">
+    <div class="form-wrapper">
+        <form class="layui-form">
+            <div class="layui-form-item my-form-item">
+                <label class="layui-form-label my-label">行业选择</label>
+                <div class="layui-input-block my-select">
+                    <select name="industry" lay-verify="required" lay-filter="industry" id="sel_industry">
+                        <option value=""></option>
+                        <option value="1001">办公家具（1001）</option>
+                        <option value="1002">办公设备（1002）</option>
+                        <option value="1003">儿童家具（1003）</option>
+                        <option value="1004">学校家具（1004）</option>
+                        <option value="1005">医院家具（1005）</option>
+                        <option value="1006">图书馆家具（1006）</option>
+                        <option value="1007">联合办公家具（1007）</option>
+                        <option value="1008">公寓家具（1008）</option>
+                        <option value="1009">餐厅家具（1009）</option>
+                        <option value="1010">酒店家具（1010）</option>
+                        <option value="1011">零售家具（1011）</option>
+                        <option value="1012">智美综合（1012）</option>
+                        <option value="1013">新风净化（1013）</option>
+                        <option value="1014">净水系统（1014）</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item my-form-item isupload-form-item">
+                <label class="layui-form-label my-label">是否上传</label>
+                <div class="layui-input-block my-select isupload-select">
+                    <select name="isupload" lay-verify="required" lay-filter="isupload" id="sel_isupload">
+                        <option value=""></option>
+                        <option value="1">未上传</option>
+                        <option value="2">已上传</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item my-form-item isupload-form-item">
+                <label class="layui-form-label">网站选择</label>
+                <div class="layui-input-inline my-text-input-250">
+                    <select name="site" lay-verify="required" lay-filter="site" id="site">
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="table">
+        <table id="article_list" lay-filter="table"></table>
+    </div>
+    <script src="./extend/layui/layui.js"></script>
+    <script type="text/html" id="tabletop">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+            <button class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+            <button class="layui-btn layui-btn-sm" lay-event="templet">结尾模板</button>
+            <?php 
+            if($authority===1)
+            { echo
+            '<button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="auto">一键发文( CC：'.$ccNum.'；Other：'.$str.'）</button>
+             <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="improve">优化</button>
+             <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="history_delete">删除历史</button>';
+            }
+            if($authority===2)
+            { echo
+            '<button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="get">索取文章</button>
+             <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="get1">索取关键词</button>';
+            }
+            ?>
+        </div>
+    </script>
+    <script type="text/html" id="status">
+        {{#  if(d.isupload == 1){ }}
+            <button class="layui-btn layui-btn-primary layui-btn-xs">未上传</button>
+        {{#  } else { }}
+            <button class="layui-btn layui-btn-xs">已上传</button>
+        {{#  } }}  
+    </script>
+    <script type="text/html" id="bar">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+    <script>
+        var json;   //全局变量，传递给子页面
+        layui.use(['form', 'table', 'layer'], function () {
+            var form = layui.form;
+            var table = layui.table;
+            var layer = layui.layer;
+            var $ = layui.$;
+
+            table.render({
+                elem: '#article_list',
+                toolbar: '#tabletop',
+                height: 530,
+                loading: true, //翻页加loading
+                url: './api/get_page_list.php', //数据接口
+                where: {
+                    'industry': '',
+                    'isupload': ''
+                }, //设定异步数据接口的额外参数
+                page: true, //开启分页
+                cols: [[ //表头
+                    { type: 'checkbox', width: '3%' },
+                    { field: 'id', title: '系统ID', width: '9%', sort: true },
+                    { field: 'industryid', title: '行业ID', width: '8%' },
+                    { field: 'title', title: '标题', width: '34%' },
+                    { field: 'datetime', title: '发布时间', width: '12%' },
+                    { field: 'inserttime', title: '采集时间', width: '12%' },
+                    { title: '状态', width: '8%', align: 'center', toolbar: '#status' },
+                    { title: '操作', width: '14.5%', align: 'center', toolbar: '#bar' }
+                ]]
+            });
+            form.on('select(industry)', function (data) {
+                table.reload('article_list', {
+                    url: './api/get_page_list.php',
+                    where: {
+                        'industry': data.value,
+                        'isupload': $('#sel_isupload').val()
+                    }, //设定异步数据接口的额外参数
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+                var a = $('#sel_industry').val();
+                switch (a)
+                {
+                    case '1001':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1001">办公家具（www.pinyuan.cc）</option>'
+                        +'<option value="1003">办公家具厂（www.china-pinyuan.com）</option>');
+                        form.render('select');
+                        break;
+                    case '1002':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1002">办公设备（www.pinyuan.cc）</option>');
+                        form.render('select');
+                        break;
+                    case '1003':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1001">办公家具（www.pinyuan.cc）</option>'
+                        +'<option value="1004">儿童家具（children.pinyuan.cc）</option>');
+                        form.render('select');
+                        break;
+                    case '1004':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1001">办公家具（www.pinyuan.cc）</option>'
+                        +'<option value="1005">学校家具（school.pinyuan.cc）</option>');
+                        form.render('select');
+                        break;
+                    case '1005':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1001">办公家具（www.pinyuan.cc）</option>'
+                        +'<option value="1006">医院家具（hospital.pinyuan.cc）</option>');
+                        form.render('select');
+                        break;
+                    case '1006':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1001">办公家具（www.pinyuan.cc）</option>'
+                        +'<option value="1007">图书馆家具（library.pinyuan.cc）</option>');
+                        form.render('select');
+                        break;
+                    case '1007':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1001">办公家具（www.pinyuan.cc）</option>'
+                        +'<option value="1003">办公家具厂（www.china-pinyuan.com）</option>'
+                        +'<option value="1008">办公家具装修（office.pinyuan.cc）</option>');
+                        form.render('select');
+                        break;
+                    case '1008':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1001">办公家具（www.pinyuan.cc）</option>'
+                        +'<option value="1009">公寓家具（apartment.pinyuan.cc）</option>');
+                        form.render('select');
+                        break;
+                    case '1009':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1001">办公家具（www.pinyuan.cc）</option>'
+                        +'<option value="1010">餐厅家具（restaurant.pinyuan.cc）</option>');
+                        form.render('select');
+                        break;
+                    case '1010':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1001">办公家具（www.pinyuan.cc）</option>'
+                        +'<option value="1011">酒店家具（hotel.pinyuan.cc）</option>');
+                        form.render('select');
+                        break;
+                    case '1011':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1001">办公家具（www.pinyuan.cc）</option>'
+                        +'<option value="1012">零售家具（shelf.pinyuan.cc）</option>');
+                        form.render('select');
+                        break;
+                    case '1012':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1013">智美综合（www.zmshoo.com）</option>');
+                        form.render('select');
+                        break;
+                    case '1013':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1014">新风净化（cleaner.zmshoo.com）</option>');
+                        form.render('select');
+                        break;
+                    case '1014':
+                        $('#site').html('<option value=""></option>');
+                        $('#site').append('<option value="1015">净水系统（water.zmshoo.com）</option>');
+                        form.render('select');
+                        break;
+                }
+            });
+            form.on('select(isupload)', function (data) {
+                table.reload('article_list', {
+                    url: './api/get_page_list.php',
+                    where: {
+                        'industry': $('#sel_industry').val(),
+                        'isupload': data.value
+                    }, //设定异步数据接口的额外参数
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+            });
+            //监听工具条
+            table.on('tool(table)', function (obj) {
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                var tr = obj.tr; //获得当前行 tr 的DOM对象
+                var id = data.id;
+
+                if (layEvent === 'edit') { //编辑
+                    data.site = $('#site').val();
+                    json = JSON.stringify(data);
+                    layer.open({
+                        type: 2,
+                        title: '编辑文章',
+                        area: ['80%', '80%'],
+                        shade: 0,
+                        maxmin: true,
+                        offset: 'auto',
+                        content: './article_edit.php',
+                        btn: ['保存', '上传', '删除', '取消'],
+                        shade: [0.4, '#393D49'],
+                        btn1: function (index, layero) {
+                            var son = layero.find("iframe")[0].contentWindow;
+                            var title_val = son.title_val.val();
+                            var keyword_val = son.keyword_val.val();
+                            var digest_val = son.digest_val.val();
+                            var content_val = son.content_val.html();
+                            var kw_id = son.kw_id;
+                            if (!title_val || !keyword_val || !digest_val || !content_val) {
+                                layer.msg('信息未填写完整', {
+                                    time: 2000000, //20s后自动关闭
+                                    btn: ['确定'],
+                                    zIndex: layer.zIndex * 1000000,
+                                });
+                                return;
+                            }
+                            //消除已上传关键词
+                            $.post('./api/keyword_update.php',{keyword:title_val});
+                            
+                            var loading = layer.load(0, {
+                                shade: false,
+                                time: 30 * 1000,
+                                zIndex: layer.zIndex * 1000000
+                            });
+                            $.ajax({
+                                url: './api/article_edit.php',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    id: id,
+                                    title: title_val,
+                                    keyword: keyword_val,
+                                    digest: digest_val,
+                                    content: content_val
+                                },
+                                success: function (data) {
+                                    layer.close(loading);
+                                    // 同步更新缓存对应的值
+                                    obj.update({
+                                        title: title_val
+                                    });
+                                    if (data.code !== 206) {
+                                        layer.msg('保存出错', {
+                                            time: 2000000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                    }
+                                },
+                                error: function () {
+                                    layer.msg('服务器连接失败', {
+                                        time: 20000, //20s后自动关闭
+                                        btn: ['确定'],
+                                        zIndex: layer.zIndex * 1000000,
+                                    });
+                                }
+                            });
+                        },
+                        btn2: function (index, layero) {
+                            var son = layero.find("iframe")[0].contentWindow;
+                            var title_val = son.title_val.val();
+                            var keyword_val = son.keyword_val.val();
+                            var digest_val = son.digest_val.val();
+                            var content_val = son.content_val.html();
+                            var site_select = data.site;
+                            var cat_select = son.cat_select.val();
+                            var is_add = son.is_add.text();
+                            var writer = son.writer;
+                            var source = son.source;
+                            var kw_id = son.kw_id;
+                            if (!title_val || !keyword_val || !digest_val || !content_val || !cat_select || !site_select) {
+                                layer.msg('信息未填写完整', {
+                                    time: 2000000, //20s后自动关闭
+                                    btn: ['确定'],
+                                    zIndex: layer.zIndex * 1000000,
+                                });
+                                return false;
+                            }
+                            //消除已上传关键词
+                            $.post('./api/keyword_update.php',{keyword:title_val});
+
+                            var loading = layer.load(0, {
+                                shade: false,
+                                time: 30 * 1000,
+                                zIndex: layer.zIndex * 1000000
+                            });
+                            $.ajax({
+                                url: './api/article_upload.php',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    id: id,
+                                    title: title_val,
+                                    keyword: keyword_val,
+                                    digest: digest_val,
+                                    content: content_val,
+                                    siteid: site_select,
+                                    column: cat_select,
+                                    writer: writer + '<?php echo $_SESSION['username'] ?>',
+                                    source: source + '<?php echo $_SESSION['username'] ?>',
+                                    isadd: is_add
+                                },
+                                success: function (data) {
+                                    // 同步更新缓存对应的值
+                                    table.reload('article_list', {
+                                        url: './api/get_page_list.php',
+                                        where: {
+                                            'industry': $('#sel_industry').val(),
+                                            'isupload': $('#sel_isupload').val()
+                                        } //设定异步数据接口的额外参数
+                                    });
+                                    if (data.code !== 207) {
+                                        layer.msg('上传出错', {
+                                            time: 2000000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                        return false;
+                                    }
+                                    layer.closeAll();
+                                },
+                                error: function () {
+                                    layer.msg('服务器连接失败', {
+                                        time: 20000, //20s后自动关闭
+                                        btn: ['确定'],
+                                        zIndex: layer.zIndex * 1000000,
+                                    });
+                                    return false;
+                                }
+                            });
+                            return false;
+                        },
+                        btn3: function () {
+                            layer.confirm('确定要删除？？', function (index) {
+                                var id = JSON.parse(json).id;
+                                $.get('./api/article_delete.php?id=' + id, function (data) {
+                                    // 同步更新缓存对应的值
+                                    table.reload('article_list', {
+                                        url: './api/get_page_list.php',
+                                        where: {
+                                            'industry': $('#sel_industry').val(),
+                                            'isupload': $('#sel_isupload').val()
+                                        } //设定异步数据接口的额外参数
+                                    });
+                                    if (data.code !== 205) {
+                                        layer.msg('删除出错', {
+                                            time: 2000000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                        return false;
+                                    }
+                                });
+                                layer.closeAll();
+                            });
+                            return false;
+                        },
+                        btn4: function () {
+                            layer.closeAll();
+                        },
+                        zIndex: layer.zIndex,
+                        success: function () {   //弹出后执行
+
+                        }
+                    });
+                } else { //删除
+                    layer.confirm('确定要删除？？', function (index) {
+                        obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                        layer.close(index);
+                        $.get('./api/article_delete.php', { id: obj.data.id });
+                    });
+                }
+            });
+            //监听头部按钮
+            table.on('toolbar(table)', function (obj) {
+                var checkStatus = table.checkStatus(obj.config.id);
+                switch (obj.event) {
+                    case 'add':
+                        layer.msg('添加');
+                        break;
+                    case 'delete':
+                        if (!checkStatus.data.length) {
+                            layer.msg('请选择要删除的文章', {
+                                time: 20000, //20s后自动关闭
+                                btn: ['确定']
+                            });
+                        } else {
+                            layer.confirm('确定要删除？？', function (index) {
+                                var art_list = [];
+                                var art_data = checkStatus.data;
+                                for (var j in checkStatus.data) {
+                                    art_list.push(art_data[j].id);
+                                }
+                                var art_str = art_list.join(',');
+                                layer.close(index);
+                                $.get('./api/article_delete.php', { id: art_str }, function () {
+                                    table.reload('article_list', {
+                                        url: './api/get_page_list.php',
+                                        where: {
+                                            'industry': $('#sel_industry').val(),
+                                            'isupload': $('#sel_isupload').val()
+                                        } //设定异步数据接口的额外参数
+                                    });
+                                });
+                            });
+                        }
+                        break;
+                    case 'templet':
+                        layer.open({
+                            type: 2,
+                            title: '结尾模板编辑',
+                            area: ['80%', '80%'],
+                            shade: 0,
+                            maxmin: true,
+                            offset: 'auto',
+                            content: './templets_edit.php',
+                            btn: ['上传', '取消'],
+                            shade: [0.4, '#393D49'],
+                            btn1: function (index, layero) {
+                                var templet_json = layero.find("iframe")[0].contentWindow.templet_json;
+                                var templet_item = layero.find("iframe")[0].contentWindow.templet_item;
+                                templet_item.each(function () {
+                                    var site_id = $(this).attr('siteid');
+                                    templet_json[site_id] = $(this).html();
+                                });
+                                var loading = layer.load(0, {
+                                    shade: false,
+                                    time: 30 * 1000
+                                });
+                                $.ajax({
+                                    url: './api/templet_edit.php',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                        data_json: JSON.stringify(templet_json)
+                                    },
+                                    success: function () {
+                                        layer.closeAll();
+                                    },
+                                    error: function () {
+                                        layer.msg('服务器连接失败', {
+                                            time: 20000, //20s后自动关闭
+                                            btn: ['确定'],
+                                            zIndex: layer.zIndex * 1000000
+                                        });
+                                    }
+                                });
+                            },
+                            btn2: function () {
+                                layer.closeAll();
+                            },
+                            zIndex: layer.zIndex,
+                            success: function () {   //弹出后执行
+                            }
+                        });
+                        break;
+                        case 'get':
+                            var loading = layer.load(0, {
+                                shade: false,
+                                time: 30 * 1000,
+                                zIndex: layer.zIndex * 1000000
+                            });
+                            $.post('./api/deliver_article.php',
+                                {
+                                    id: <?php echo $_SESSION['id']; ?>
+                                },
+                                function (data) {
+                                    if (data.code === 212) {
+                                        layer.msg('获取成功', {
+                                            time: 3000, //20s后自动关闭
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                        table.reload('article_list', {
+                                            url: './api/get_page_list.php',
+                                            where: {
+                                                'industry': $('#sel_industry').val(),
+                                                'isupload': $('#sel_isupload').val()
+                                            } //设定异步数据接口的额外参数
+                                        });
+                                        layer.close(loading);
+                                    }else{
+                                        layer.msg('获取失败', {
+                                            time: 3000, //20s后自动关闭
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                        layer.close(loading);
+                                    }
+                                });
+                        break;
+                        case 'auto':
+                            layer.prompt({
+                                formType: 0,
+                                value: localStorage.getItem('numset1') === null ? '160,3' : localStorage.getItem('numset1'),
+                                maxlength: 10000,
+                                title: '配置发文数量',
+                                area: ['500px', '250px'] //自定义文本域宽高
+                            }, function (value, index, elem) {
+                                var loading = layer.load(0, {
+                                    shade: false,
+                                    time: 30 * 1000,
+                                    zIndex: layer.zIndex * 1000000
+                                });
+                                $.ajaxSettings.async = false;
+                                var cc = parseInt(value.split(',')[0])
+                                ,other = parseInt(value.split(',')[1])
+                                ,siteid_arr = ['1004','1003','1005','1006','1007','1008','1009','1010','1011','1012','1013','1014','1015'] 
+                                ,i=0
+                                ,z=0
+                                ,x=0
+                                ,c=function(){
+                                    if(x>=10){
+                                        x=0;
+                                        z++;
+                                        b();
+                                    }else{
+                                        $.post('./api/auto_push_article.php',
+                                            {
+                                                siteid:siteid_arr[z]
+                                            },
+                                            function (data) {
+                                                if (data.code === 231) {
+                                                    x++;
+                                                    c();
+                                                } else {
+                                                    // layer.msg('上传失败', {
+                                                    //     time: 3000,
+                                                    //     zIndex: layer.zIndex * 1000000,
+                                                    // });
+                                                    // layer.close(loading);
+                                                }
+                                            }
+                                        );
+                                    }
+                                }
+                                ,b=function(){
+                                    if(x>=other){
+                                        x=0;
+                                        z++;
+                                        if(z>=siteid_arr.length){
+                                            layer.msg('上传成功', {
+                                                time: 3000,
+                                                zIndex: layer.zIndex * 1000000,
+                                            });
+                                            localStorage.setItem('numset1',value);
+                                            layer.close(loading);
+                                            return false;
+                                        }else if(z===1){
+                                            c();
+                                        }else{
+                                            b();
+                                        }
+                                    }else{
+                                        $.post('./api/auto_push_article.php',
+                                            {
+                                                siteid:siteid_arr[z]
+                                            },
+                                            function (data) {
+                                                if (data.code === 231) {
+                                                    x++;
+                                                    b();
+                                                } else {
+                                                    // layer.msg('上传失败', {
+                                                    //     time: 3000,
+                                                    //     zIndex: layer.zIndex * 1000000,
+                                                    // });
+                                                    // layer.close(loading);
+                                                }
+                                            }
+                                        );
+                                    }
+                                }
+                                ,a = function(siteid){
+                                    if(cc){
+                                        if(i>=cc){
+                                            if(other){
+                                                b();
+                                            }else{
+                                                layer.msg('上传成功', {
+                                                    time: 3000,
+                                                    zIndex: layer.zIndex * 1000000,
+                                                });
+                                                localStorage.setItem('numset1',value);
+                                                layer.close(loading);
+                                            }
+                                            return false;
+                                        }
+                                        $.post('./api/auto_push_article.php',
+                                            {
+                                                siteid:siteid
+                                            },
+                                            function (data) {
+                                                if (data.code === 231) {
+                                                    i++;
+                                                    a(siteid);
+                                                } else {
+                                                    layer.msg('上传失败', {
+                                                        time: 3000,
+                                                        zIndex: layer.zIndex * 1000000,
+                                                    });
+                                                    layer.close(loading);
+                                                }
+                                            }
+                                        );
+                                    }else{
+                                        b();
+                                    }
+                                }
+                                layer.close(index);
+                                setTimeout(function(){a('1001')},1);
+                            });
+                        break;
+                        case 'improve':
+                            layer.prompt({
+                                formType: 0,
+                                value: '首次',
+                                maxlength: 10000,
+                                title: '优化类型(首次或二次)',
+                                area: ['500px', '250px'] //自定义文本域宽高
+                            }, function (value, index, elem) {
+                                var loading = layer.load(0, {
+                                    shade: false,
+                                    time: 100 * 1000,
+                                    zIndex: layer.zIndex * 1000000
+                                });
+                                var arr = [285,233,228,245,2,6,7,21,112,113,115]
+                                ,i = 0;
+                                function go(){
+                                    if(i>=arr.length){
+                                        layer.msg('优化成功', {
+                                            time: 3000,
+                                            zIndex: layer.zIndex * 1000000,
+                                        });
+                                        layer.close(loading);
+                                        layer.close(index);
+                                        return;
+                                    }
+                                    $.ajax({
+                                        url:'http://it.mkai8.com/article-auto/improve/article_improve.php',
+                                        type:'POST',
+                                        dataType:'json',
+                                        data:{
+                                            typeid: arr[i],
+                                            type: value
+                                        },
+                                        success:function(res){
+                                            if(res.code === 232){
+                                                i++;
+                                                go();
+                                            }else{
+                                                layer.msg('获取失败', {
+                                                    time: 3000,
+                                                    zIndex: layer.zIndex * 1000000,
+                                                });
+                                                layer.close(loading);
+                                            }
+                                        },
+                                        error:function(){
+
+                                        }
+                                    });
+                                }
+                                go();
+                            });
+                        break;
+                        case 'history_delete':
+                        layer.confirm('确定要删除？？', function (index) {
+                            layer.close(index);
+                            $.get('./api/article_history_delete.php', function () {
+                                table.reload('article_list', {
+                                    url: './api/get_page_list.php',
+                                    where: {
+                                        'industry': $('#sel_industry').val(),
+                                        'isupload': $('#sel_isupload').val()
+                                    } //设定异步数据接口的额外参数
+                                });
+                            });
+                        });
+                        break;
+                        case 'get1':
+                            layer.prompt({
+                                formType: 0,
+                                value: localStorage.getItem('numset') === null ? '100,30' : localStorage.getItem('numset'),
+                                maxlength: 10000,
+                                title: '填写索取数量',
+                                area: ['500px', '250px'] //自定义文本域宽高
+                            }, function (value, index, elem) {
+                                var loading = layer.load(0, {
+                                    shade: false,
+                                    time: 30 * 1000,
+                                    zIndex: layer.zIndex * 1000000
+                                });
+                                $.post('./api/deliver_keyword.php',
+                                    {
+                                        id: <?php echo $_SESSION['id']; ?>,
+                                        cc: value.split(',')[0],
+                                        other: value.split(',')[1]
+                                    },
+                                    function (data) {
+                                        if (data.code === 212) {
+                                            layer.msg('获取成功', {
+                                                time: 3000,
+                                                zIndex: layer.zIndex * 1000000,
+                                            });
+                                            localStorage.setItem('numset',value);
+                                            layer.close(loading);
+                                            layer.close(index);
+                                        } else {
+                                            layer.msg('获取失败', {
+                                                time: 3000,
+                                                zIndex: layer.zIndex * 1000000,
+                                            });
+                                            layer.close(loading);
+                                        }
+                                    }
+                                );
+                            });
+                        break;
+                    };
+            });
+        });
+    </script>
+</body>
+
+</html>
